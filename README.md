@@ -1,9 +1,9 @@
 # Transient Grating Project
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
-![Jupyter Notebook](https://img.shields.io/badge/Jupyter-Notebook-F37626?logo=jupyter&logoColor=white)
-![Status](https://img.shields.io/badge/status-active-success)
+[License: MIT](https://opensource.org/licenses/MIT)
+Python
+Jupyter Notebook
+Status
 
 Repository for transient grating (TG) signal analysis, including:
 
@@ -123,8 +123,6 @@ Use either:
 - Plot rendering currently uses LaTeX text mode (`text.usetex = True`), which
 requires a working LaTeX installation on your system.
 - Some methods assume specific MATLAB internal structure under key `R`.
-- The current implementation is focused on TG preprocessing/visualization;
-dedicated model-fitting interfaces can be added incrementally.
 
 ## Next improvements (suggested)
 
@@ -137,4 +135,3 @@ dedicated model-fitting interfaces can be added incrementally.
 
 This project is distributed under the MIT License.
 See `LICENSE` for the full text.
-
