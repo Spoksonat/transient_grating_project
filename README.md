@@ -1,9 +1,9 @@
 # Transient Grating Project
 
-[License: MIT](https://opensource.org/licenses/MIT)
-Python
-Jupyter Notebook
-Status
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
+![Jupyter Notebook](https://img.shields.io/badge/Jupyter-Notebook-F37626?logo=jupyter&logoColor=white)
+![Status](https://img.shields.io/badge/status-active-success)
 
 Repository for transient grating (TG) signal analysis, including:
 
