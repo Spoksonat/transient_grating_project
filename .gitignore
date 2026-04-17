@@ -11,6 +11,7 @@ __pycache__/
 .venv/
 venv/
 env/
+Env_TG/
 
 # Keep folder but ignore external content by default
 external_files/*

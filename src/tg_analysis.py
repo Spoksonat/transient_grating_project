@@ -382,7 +382,7 @@ class TGAnalysis:
         # --- Right Y axis: Decay Time ---
         ax2 = ax1.twinx()
         
-        ax2.errorbar(self.energies, self.taus_fit * 1000, yerr=self.errors_tau_fit * 1000,
+        ax2.errorbar(self.energies, self.taus_fit * 1000, yerr=self.errors_tau_fit * 0,
                      fmt='o-',
                      color='blue',
                      ecolor='blue',
