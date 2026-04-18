@@ -20,6 +20,14 @@ dependencies = [
   "ipykernel>=7.1.0",
 ]
 
+[project.optional-dependencies]
+docs = [
+  "sphinx>=7.3.0",
+  "furo>=2024.8.6",
+]
+
 [tool.setuptools]
 package-dir = { "" = "src" }
-py-modules = ["tg_analysis"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

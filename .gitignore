@@ -6,12 +6,16 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ipynb_checkpoints/
+*.egg-info/
 
 # Virtual environments
 .venv/
 venv/
 env/
 Env_TG/
+
+# Sphinx / docs build outputs
+docs/_build/
 
 # Keep folder but ignore external content by default
 external_files/*

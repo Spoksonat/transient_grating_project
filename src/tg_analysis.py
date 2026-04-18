@@ -1,3 +1,10 @@
+"""Core tools for transient grating (TG) analysis.
+
+This module provides the :class:`TGAnalysis` class to load scan metadata from
+JSON files, extract TG traces from MATLAB ``.mat`` files, fit different model
+functions, and generate diagnostic plots.
+"""
+
 import json
 import matplotlib.pyplot as plt
 import scipy.io
@@ -14,11 +21,35 @@ plt.rcParams.update({
 })
 
 class TGAnalysis:
+    """Transient grating analysis pipeline.
+
+    Parameters
+    ----------
+    json_path : str
+        Path to the metadata JSON file. The file must contain a ``main_path``
+        entry with the folder of ``.mat`` scans and multiple ``ScanXXX`` items.
+    """
+
     def __init__(self, json_path):
+        """Initialize the analysis object and load metadata."""
         self.json_path = json_path
         self.load_data()
 
     def filter_time(self, x, y):
+        """Trim arrays before the first detected time-axis reset.
+
+        Parameters
+        ----------
+        x : numpy.ndarray
+            Time axis.
+        y : numpy.ndarray
+            TG signal values associated with ``x``.
+
+        Returns
+        -------
+        tuple[numpy.ndarray, numpy.ndarray]
+            Filtered time and signal arrays up to the first negative time step.
+        """
         # 1. Find where the difference is negative
         decreasing_mask = np.diff(x) < 0
     
@@ -32,6 +63,7 @@ class TGAnalysis:
         return first_part_time, first_part_signal
 
     def load_data(self):
+        """Read metadata JSON and build the scans dataframe."""
         # open and load JSON file
         with open(self.json_path, "r") as f:
             self.json_data = json.load(f)
@@ -42,6 +74,18 @@ class TGAnalysis:
         self.df_scans = pd.DataFrame(scans_only)
 
     def get_data_E_const(self, energy_eV):
+        """Select scans at fixed energy and variable intensity.
+
+        Parameters
+        ----------
+        energy_eV : float
+            Target energy in eV.
+
+        Returns
+        -------
+        tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]
+            Scan labels, energies, intensities, and per-scan filter flags.
+        """
         df_const_E = self.df_scans[(self.df_scans["flag_secure"] == True) & (self.df_scans["Energy_eV"] == energy_eV) & (self.df_scans["repeated"] == False)]
         df_const_E = df_const_E.sort_values(by="XUV_intensity_uJ")
         scans_const_E = self.df_const_E["Scan"].to_numpy()
@@ -52,6 +96,18 @@ class TGAnalysis:
         return scans_const_E, E_const_E, I_const_E, filter
 
     def get_data_I_const(self, intensity_uJ):
+        """Select scans at fixed intensity and variable energy.
+
+        Parameters
+        ----------
+        intensity_uJ : float
+            Target XUV intensity in microjoules.
+
+        Returns
+        -------
+        tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]
+            Scan labels, energies, intensities, and per-scan filter flags.
+        """
         df_const_I = self.df_scans[(self.df_scans["flag_secure"] == True) & (self.df_scans["XUV_intensity_uJ"] == intensity_uJ) & (self.df_scans["repeated"] == False)]
         df_const_I = df_const_I.sort_values(by="Energy_eV")
         scans_const_I = df_const_I["Scan"].to_numpy()
@@ -62,6 +118,19 @@ class TGAnalysis:
         return scans_const_I, E_const_I, I_const_I, filter
 
     def get_data_scan(self, params_scan):
+        """Load and preprocess TG traces for a scan selection.
+
+        Parameters
+        ----------
+        params_scan : dict
+            Scan-selection configuration. Supported patterns are:
+            ``{"E": "all", "I": value}`` or ``{"E": value, "I": "all"}``.
+
+        Raises
+        ------
+        ValueError
+            If both ``E`` and ``I`` are fixed (or both are ``"all"``).
+        """
         if(params_scan["E"] == "all" and params_scan["I"] != "all"):
             self.scans, self.energies, self.intensities, filter = self.get_data_I_const(params_scan["I"])
         elif(params_scan["E"] != "all" and params_scan["I"] == "all"):
@@ -106,6 +175,7 @@ class TGAnalysis:
            self.iomsh_ave2_scans.append(self.iomsh_ave2)
 
     def model1(self, t, amp1, t0, tau, sigma, amp2):
+        """Model 1: mono-exponential decay convolved with Gaussian response."""
         exp1 = np.exp(-(t - t0)/tau)
         exp2 = np.exp(sigma**2/(2*tau**2))
         erf1 = special.erf((t - t0 - sigma**2/tau)/(np.sqrt(2)*sigma))
@@ -114,6 +184,7 @@ class TGAnalysis:
         return function
 
     def model2(self, t, amp1, t0, tau, sigma, amp2, omega, phi, amp3, k):
+        """Model 2: model 1 plus damped oscillatory contribution."""
         exp1 = np.exp(-(t - t0)/tau)
         exp2 = np.exp(sigma**2/(2*tau**2))
         exp3 = np.exp(-k*(t - t0))
@@ -126,6 +197,7 @@ class TGAnalysis:
         return function
 
     def model3(self, t, amp1, t0, tau, tau2, sigma, amp2, amp3):
+        """Model 3: bi-exponential decay convolved with Gaussian response."""
         exp1 = np.exp(-(t - t0)/tau)
         exp2 = np.exp(-(t - t0)/tau2)
         exp3 = np.exp(sigma**2/(2*tau**2))
@@ -137,6 +209,17 @@ class TGAnalysis:
         return function
 
     def get_fit_parameters(self, model_idxs, initial_guess_bool=False, bounds=False):
+        """Fit selected model(s) to every loaded scan.
+
+        Parameters
+        ----------
+        model_idxs : int or list[int]
+            Model index (1, 2, or 3) for all scans, or one index per scan.
+        initial_guess_bool : bool, optional
+            If ``True``, pass predefined initial guesses to ``curve_fit``.
+        bounds : bool, optional
+            If ``True``, use predefined lower/upper bounds in the optimization.
+        """
 
         self.params_fit = []
         self.times_fit = []
@@ -288,6 +371,7 @@ class TGAnalysis:
             self.params_fit.append(params)
 
     def plot_phase_space(self):
+        """Plot the phase-space coverage of secure, non-repeated scans."""
         df_phase_space = self.df_scans[(self.df_scans["flag_secure"] == True) & (self.df_scans["repeated"] == False)]
         scans_phase_space = df_phase_space["Scan"].to_numpy()
         E_phase_space = df_phase_space["Energy_eV"].to_numpy()
@@ -305,6 +389,7 @@ class TGAnalysis:
         plt.show()
 
     def plot_fits(self):
+        """Plot data vs fitted curves and relative error per scan."""
         if not hasattr(self, "times_fit") or not hasattr(self, "tgsignals_fit"):
             raise ValueError("Fit data not found. Run get_fit_parameters() first.")
         if not hasattr(self, "tgsignals_sampled_fit"):
@@ -358,6 +443,7 @@ class TGAnalysis:
         plt.show()
 
     def plot_taus_vs_energy(self):
+        """Plot fitted decay times vs energy with absorbance references."""
         
         data_Co2plus = np.genfromtxt("/Users/manuelfernandosanchezalarcon/Desktop/Trieste_Project/Transient_Grating/transient_grating_project/external_files/Co2plus_absorbance.txt")
         data_Co3plus = np.genfromtxt("/Users/manuelfernandosanchezalarcon/Desktop/Trieste_Project/Transient_Grating/transient_grating_project/external_files/Co3plus_absorbance.txt")
@@ -402,6 +488,21 @@ class TGAnalysis:
         plt.show()
 
     def plot_stacked_signals(self, limits_time=None, limits_signal=None, ylog_scale = False, plot_ind=None, data_over_fit=False):
+        """Plot stacked TG signals and optionally stacked fits.
+
+        Parameters
+        ----------
+        limits_time : tuple[float, float] or None, optional
+            Time-axis limits in ps.
+        limits_signal : tuple[float, float] or None, optional
+            Signal-axis limits.
+        ylog_scale : bool, optional
+            If ``True``, display y-axis in logarithmic scale.
+        plot_ind : list[int] or str or None, optional
+            Subset of scan indices to plot, or ``"all"`` for every scan.
+        data_over_fit : bool, optional
+            If ``True``, overlay sampled data in the fit panel.
+        """
         fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
         ax_data, ax_fit = axes
         for i, (time, tgsignal) in enumerate(zip(self.time_scans, self.tgsignal_scans)):
@@ -460,6 +561,15 @@ class TGAnalysis:
         plt.show()
 
     def plot_taus_all_models(self, models_config, errors_bool=False):
+        """Compare fitted decay times for multiple model configurations.
+
+        Parameters
+        ----------
+        models_config : list[dict]
+            List of fitting configurations passed to ``get_fit_parameters``.
+        errors_bool : bool, optional
+            If ``True``, include error bars for fitted ``tau`` values.
+        """
 
         plt.figure(figsize=(8, 5))
         for model_config in models_config:
