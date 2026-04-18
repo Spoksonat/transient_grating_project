@@ -3,11 +3,6 @@ name: Deploy Sphinx docs to GitHub Pages
 on:
   push:
     branches: ["main"]
-    paths:
-      - "docs/**"
-      - "src/tg_analysis.py"
-      - "pyproject.toml"
-      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 permissions:
