@@ -82,4 +82,4 @@ Practical note
 
 Use :meth:`tg_analysis.TGAnalysis.get_fit_parameters` to apply these models to
 all loaded scans and compute fitted parameters, uncertainties, reduced
-:math:`\chi^2`, and :math:`R^2`.
+:math:`\chi^2` values, and :math:`R^2` values.
