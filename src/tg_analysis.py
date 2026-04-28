@@ -163,7 +163,6 @@ class TGAnalysis:
 
            self.tgsignal = self.tgsignal - np.min(self.tgsignal)
            self.tgsignal = self.tgsignal / np.sum(self.tgsignal)
-           #self.time = self.time - self.time[np.argmax(self.tgsignal)]
 
            mask = (self.time < 2.5) & (self.time > -1)
            self.time = self.time[mask]
