@@ -1,0 +1,259 @@
+{
+  "main_path": "/Volumes/20174084/results/OutPut/CoOx12/",
+  "Scan038": {
+    "Scan": "Scan038",
+    "Energy_eV": 63.6,
+    "XUV_intensity_uJ": 7.7,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan039": {
+    "Scan": "Scan039",
+    "Energy_eV": 63.6,
+    "XUV_intensity_uJ": 8.1,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan040": {
+    "Scan": "Scan040",
+    "Energy_eV": 63.6,
+    "XUV_intensity_uJ": 3.7,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan041": {
+    "Scan": "Scan041",
+    "Energy_eV": 63.6,
+    "XUV_intensity_uJ": 3.9,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan042": {
+    "Scan": "Scan042",
+    "Energy_eV": 63.6,
+    "XUV_intensity_uJ": 1.6,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan043": {
+    "Scan": "Scan043",
+    "Energy_eV": 63.6,
+    "XUV_intensity_uJ": 1.7,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan051": {
+    "Scan": "Scan051",
+    "Energy_eV": 63.6,
+    "XUV_intensity_uJ": 2.0,
+    "flag_secure": true,
+    "repeated": false,
+    "filter": false
+  },
+  "Scan052": {
+    "Scan": "Scan052",
+    "Energy_eV": 57.0,
+    "XUV_intensity_uJ": 2.0,
+    "flag_secure": true,
+    "repeated": false, 
+    "filter": true
+  },
+  "Scan054": {
+    "Scan": "Scan054",
+    "Energy_eV": 62.0,
+    "XUV_intensity_uJ": 10.4,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan055": {
+    "Scan": "Scan055",
+    "Energy_eV": 62.0,
+    "XUV_intensity_uJ": 2.0,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan056": {
+    "Scan": "Scan056",
+    "Energy_eV": 67.0,
+    "XUV_intensity_uJ": 2.0,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan059": {
+    "Scan": "Scan059",
+    "Energy_eV": 59.0,
+    "XUV_intensity_uJ": 2.0,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": true
+  },
+  "Scan060": {
+    "Scan": "Scan060",
+    "Energy_eV": 55.0,
+    "XUV_intensity_uJ": 2.0,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan062": {
+    "Scan": "Scan062",
+    "Energy_eV": 65.0,
+    "XUV_intensity_uJ": 2.0,
+    "flag_secure": true, 
+    "repeated": false,  
+    "filter": false
+  },
+   "Scan073": {
+    "Scan": "Scan073",
+    "Energy_eV": 60.5,
+    "XUV_intensity_uJ": 2.0,
+    "flag_secure": true,
+    "repeated": true,  
+    "filter": false
+  },
+  "Scan075": {
+    "Scan": "Scan075",
+    "Energy_eV": 63.5,
+    "XUV_intensity_uJ": 2.0,
+    "flag_secure": true,
+    "repeated": true,  
+    "filter": true
+  },
+  "Scan076": {
+    "Scan": "Scan076",
+    "Energy_eV": 63.5,
+    "XUV_intensity_uJ": 1.0,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan079": {
+    "Scan": "Scan079",
+    "Energy_eV": 59.0,
+    "XUV_intensity_uJ": 2.0,
+    "flag_secure": true,
+    "repeated": true,  
+    "filter": false
+  },
+  "Scan080": {
+    "Scan": "Scan080",
+    "Energy_eV": 59.0,
+    "XUV_intensity_uJ": 1.0,
+    "flag_secure": true,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan081": {
+    "Scan": "Scan081",
+    "Energy_eV": 59.0,
+    "XUV_intensity_uJ": 2.0,
+    "flag_secure": true,
+    "repeated": true,  
+    "filter": false
+  },
+  "Scan078": {
+    "Scan": "Scan078",
+    "Energy_eV": 59.0,
+    "XUV_intensity_uJ": 19.7,
+    "flag_secure": false,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan082": {
+    "Scan": "Scan082",
+    "Energy_eV": 63.5,
+    "XUV_intensity_uJ": 16.5,
+    "flag_secure": false,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan084": {
+    "Scan": "Scan084",
+    "Energy_eV": 63.5,
+    "XUV_intensity_uJ": 8.0,
+    "flag_secure": false,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan085": {
+    "Scan": "Scan085",
+    "Energy_eV": 63.5,
+    "XUV_intensity_uJ": 7.7,
+    "flag_secure": false,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan087": {
+    "Scan": "Scan087",
+    "Energy_eV": 63.5,
+    "XUV_intensity_uJ": 5.0,
+    "flag_secure": false,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan088": {
+    "Scan": "Scan088",
+    "Energy_eV": 63.5,
+    "XUV_intensity_uJ": 4.9,
+    "flag_secure": false,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan089": {
+    "Scan": "Scan089",
+    "Energy_eV": 63.5,
+    "XUV_intensity_uJ": 5.1,
+    "flag_secure": false,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan091": {
+    "Scan": "Scan091",
+    "Energy_eV": 59.0,
+    "XUV_intensity_uJ": 19.8,
+    "flag_secure": false,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan096": {
+    "Scan": "Scan096",
+    "Energy_eV": 63.5,
+    "XUV_intensity_uJ": 0.3,
+    "flag_secure": false,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan097": {
+    "Scan": "Scan097",
+    "Energy_eV": 63.5,
+    "XUV_intensity_uJ": 0.3,
+    "flag_secure": false,
+    "repeated": true,  
+    "filter": false
+  },
+  "Scan099": {
+    "Scan": "Scan099",
+    "Energy_eV": 63.5,
+    "XUV_intensity_uJ": 2.2,
+    "flag_secure": false,
+    "repeated": false,  
+    "filter": false
+  },
+  "Scan101": {
+    "Scan": "Scan101",
+    "Energy_eV": 59.0,
+    "XUV_intensity_uJ": 2.3,
+    "flag_secure": false,
+    "repeated": false,  
+    "filter": false
+  }
+}

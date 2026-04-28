@@ -27,13 +27,13 @@ Minimal example
    analysis.get_data_scan(params_scan)
 
    # 3) Fit model 2 and inspect results
-   analysis.get_fit_parameters(model_idxs=2, initial_guess_bool=False, bounds=True)
+   analysis.get_fit_parameters(model_idxs=1, initial_guess_bool=True, bounds=True)
    analysis.plot_fits()
-   analysis.plot_taus_vs_energy()
+   analysis.plot_params_vs_energy(param_name="tau", errors_bool=True)
 
 Common next steps
 -----------------
 
 * Try ``params_scan = {"E": value, "I": "all"}`` to compare intensities at fixed energy.
-* Compare models with ``plot_taus_all_models(...)``.
+* Compare models with ``plot_params_all_models(...)``.
 * Use ``plot_stacked_signals(...)`` to inspect specific scans.

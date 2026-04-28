@@ -41,10 +41,10 @@ Minimal workflow
 
 .. code-block:: python
 
-   model_idxs = 2
+   model_idxs = 1
    analysis.get_fit_parameters(
        model_idxs=model_idxs,
-       initial_guess_bool=False,
+       initial_guess_bool=True,
        bounds=True,
    )
 
@@ -53,7 +53,7 @@ Minimal workflow
 .. code-block:: python
 
    analysis.plot_fits()
-   analysis.plot_taus_vs_energy()
+   analysis.plot_params_vs_energy(param_name="tau", errors_bool=True)
 
 8. Use stacked plots for detailed inspection:
 
@@ -63,18 +63,29 @@ Minimal workflow
        limits_time=(0.0, 0.8),
        limits_signal=(0.1, 1.0),
        ylog_scale=False,
-       plot_ind=[6],
-       data_over_fit=False,
+       plot_ind=None,
+       data_over_fit=True,
    )
+
+9. Compare fit behavior across model configurations:
+
+.. code-block:: python
+
+   models_config = [
+       {"model_idxs": 1, "initial_guess_bool": True, "bounds": True, "label_model": "Model 1"},
+       {"model_idxs": 2, "initial_guess_bool": True, "bounds": True, "label_model": "Model 2"},
+   ]
+   analysis.plot_params_all_models(models_config, param_name="tau", errors_bool=False)
 
 What each block does in practice
 --------------------------------
 
 * ``TGAnalysis(json_path)`` loads metadata and builds ``df_scans`` with all ``ScanXXX`` entries.
-* ``get_data_scan(...)`` reads ``.mat`` files from ``main_path``, applies optional time filtering, normalizes traces, and aligns the time origin.
-* ``get_fit_parameters(...)`` runs ``curve_fit`` scan by scan and computes ``tau``, fit errors, reduced :math:`\chi^2`, and :math:`R^2`.
-* ``plot_fits()`` compares measured data vs fitted curves and includes relative error.
-* ``plot_taus_vs_energy()`` combines decay times with absorbance reference curves.
+* ``get_data_scan(...)`` reads ``.mat`` files from ``main_path``, applies optional time filtering, subtracts baseline, and normalizes each TG trace by its integral.
+* ``get_fit_parameters(...)`` runs ``curve_fit`` scan by scan and stores values + uncertainties in ``params_fit`` for each parameter.
+* ``plot_fits()`` compares measured data vs fitted curves and reports :math:`\chi^2/\mathrm{dof}` and :math:`R^2`.
+* ``plot_params_vs_energy(...)`` overlays absorbance references and any selected fitted parameter (for example ``"tau"``, ``"sigma"``, or ``"omega"``).
+* ``plot_params_all_models(...)`` compares one fitted parameter across multiple model configurations.
 * ``plot_stacked_signals(...)`` compares experimental traces and fitted curves in stacked panels.
 
 Recommended good practices
@@ -82,5 +93,5 @@ Recommended good practices
 
 * Confirm that ``main_path`` in the JSON points to the correct ``.mat`` directory.
 * Run ``get_data_scan`` before any fitting method or fit-related plot.
-* Start with ``model_idxs = 2`` (as in the notebook), then compare with mixed model configurations.
+* Start with one global model index (for example ``model_idxs = 1``), then compare alternatives using ``plot_params_all_models(...)``.
 * Keep exploratory work in notebooks and migrate stable steps to scripts/modules.

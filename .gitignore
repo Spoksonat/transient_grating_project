@@ -10,8 +10,6 @@ __pycache__/
 
 # Virtual environments
 .venv/
-venv/
-env/
 Env_TG/
 
 # Sphinx / docs build outputs
@@ -20,3 +18,4 @@ docs/_build/
 # Keep folder but ignore external content by default
 external_files/*
 !external_files/README.md
+!external_files/parameters_CoOx12.json

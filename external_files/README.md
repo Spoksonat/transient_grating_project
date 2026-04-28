@@ -17,6 +17,8 @@ This folder stores metadata and external reference inputs used by the analysis c
 - select scans by energy/intensity,
 - filter by quality/repetition flags.
 
+The notebook `src/results_tg.ipynb` also uses this file as its primary metadata entry point.
+
 ## Conventions for new files
 
 - Keep file names descriptive and stable.
@@ -28,3 +30,4 @@ This folder stores metadata and external reference inputs used by the analysis c
 - Keep lightweight metadata and small reference files in git.
 - Do not commit large raw datasets by default.
 - If sharing large data is required, prefer Git LFS or external storage.
+- `parameters_CoOx12.json` is intentionally tracked and should be committed when metadata changes.

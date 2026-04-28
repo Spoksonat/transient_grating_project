@@ -162,8 +162,8 @@ class TGAnalysis:
                self.time, self.tgsignal = self.filter_time(self.time, self.tgsignal)
 
            self.tgsignal = self.tgsignal - np.min(self.tgsignal)
-           self.tgsignal = (self.tgsignal - np.min(self.tgsignal)) / (np.max(self.tgsignal) - np.min(self.tgsignal))
-           self.time = self.time - self.time[np.argmax(self.tgsignal)]
+           self.tgsignal = self.tgsignal / np.sum(self.tgsignal)
+           #self.time = self.time - self.time[np.argmax(self.tgsignal)]
 
            mask = (self.time < 2.5) & (self.time > -1)
            self.time = self.time[mask]
@@ -174,38 +174,47 @@ class TGAnalysis:
            self.iomsh_ave_scans.append(self.iomsh_ave)
            self.iomsh_ave2_scans.append(self.iomsh_ave2)
 
-    def model1(self, t, amp1, t0, tau, sigma, amp2):
+    def model1(self, t, amp1, t0, k_tau, sigma, amp2):
         """Model 1: mono-exponential decay convolved with Gaussian response."""
-        exp1 = np.exp(-(t - t0)/tau)
-        exp2 = np.exp(sigma**2/(2*tau**2))
-        erf1 = special.erf((t - t0 - sigma**2/tau)/(np.sqrt(2)*sigma))
+        exp1 = np.exp(-(t - t0)*k_tau)
+        exp2 = np.exp(0.5*(k_tau*sigma)**2)
+        erf1 = special.erf((t - t0 - k_tau*sigma**2)/(np.sqrt(2)*sigma))
         erf2 = special.erf((t-t0)/(np.sqrt(2)*sigma))
         function = amp1*exp1*exp2*(1 + erf1) + amp2*(1 + erf2)
         return function
 
-    def model2(self, t, amp1, t0, tau, sigma, amp2, omega, phi, amp3, k):
-        """Model 2: model 1 plus damped oscillatory contribution."""
-        exp1 = np.exp(-(t - t0)/tau)
-        exp2 = np.exp(sigma**2/(2*tau**2))
-        exp3 = np.exp(-k*(t - t0))
-        exp4 = np.exp(-0.5*k*sigma**2)
-        erf1 = special.erf((t - t0 - sigma**2/tau)/(np.sqrt(2)*sigma))
+    def model2(self, t, amp1, t0, k1, sigma, amp2, omega, phi, amp3, k2):
+        """Model 2: bi-exponential decay: one decay plus one damped oscillatory contribution."""
+        exp1 = np.exp(-(t - t0)*k1)
+        exp2 = np.exp(0.5*(k1*sigma)**2)
+        exp3 = np.exp(-k2*(t - t0))
+        exp4 = np.exp(-0.5*(k2*sigma)**2)
+        erf1 = special.erf((t - t0 - k1*sigma**2)/(np.sqrt(2)*sigma))
         erf2 = special.erf((t-t0)/(np.sqrt(2)*sigma))
-        erf3 = special.erf((t-t0-k*sigma**2)/(np.sqrt(2)*sigma))
+        erf3 = special.erf((t-t0-k2*sigma**2)/(np.sqrt(2)*sigma))
         osc_factor = np.sin(omega*t - phi) - np.cos(omega*t - phi)
         function = amp1*exp1*exp2*(1 + erf1) + amp2*(1 + erf2) + amp3*exp3*exp4*(1 + erf3)*osc_factor 
         return function
 
-    def model3(self, t, amp1, t0, tau, tau2, sigma, amp2, amp3):
-        """Model 3: bi-exponential decay convolved with Gaussian response."""
-        exp1 = np.exp(-(t - t0)/tau)
-        exp2 = np.exp(-(t - t0)/tau2)
-        exp3 = np.exp(sigma**2/(2*tau**2))
-        exp4 = np.exp(sigma**2/(2*tau2**2))
-        erf1 = special.erf((t - t0 - sigma**2/tau)/(np.sqrt(2)*sigma))
-        erf2 = special.erf((t - t0 - sigma**2/tau2)/(np.sqrt(2)*sigma))
-        erf3 = special.erf((t-t0)/(np.sqrt(2)*sigma))
-        function = amp1*(1 + erf3) + amp2*exp1*exp3*(1 + erf1) + amp3*exp2*exp4*(1 + erf2)
+    def model3(self, t, amp1, amp2, amp3, amp4, t0, k1, k2, sigma, omega, phi):
+        """Model 3: multi-exponential decay: two decay plus one damped oscillatory contribution."""
+        k10 = k1 + 1/t0
+        k20 = k2 + 1/t0
+        exp1 = np.exp(-(t - t0)*k1)
+        exp2 = np.exp(-(t - t0)*k2)
+        exp3 = np.exp(-(t - t0)*k10)
+        exp4 = np.exp(-(t - t0)*k20)
+        exp5 = np.exp(-0.5*(k1*sigma)**2)
+        exp6 = np.exp(-0.5*(k2*sigma)**2)
+        exp7 = np.exp(-0.5*(k10*sigma)**2)
+        exp8 = np.exp(-0.5*(k20*sigma)**2)
+        erf1 = special.erf((t - t0 - k1*sigma**2)/(np.sqrt(2)*sigma))
+        erf2 = special.erf((t - t0 - k2*sigma**2)/(np.sqrt(2)*sigma))
+        erf3 = special.erf((t-t0-k10*sigma**2)/(np.sqrt(2)*sigma))
+        erf4 = special.erf((t-t0-k20*sigma**2)/(np.sqrt(2)*sigma))
+        erf5 = special.erf((t-t0)/(np.sqrt(2)*sigma))
+        osc_factor = np.sin(omega*t - phi) - np.cos(omega*t - phi)
+        function = amp1*exp1*exp5*(1 + erf1) + amp2*exp2*exp6*(1 + erf2) - amp3*exp3*exp7*osc_factor*(1 + erf3) + amp3*exp4*exp8*(1 + erf4)*osc_factor + amp4*(1 + erf5)
         return function
 
     def get_fit_parameters(self, model_idxs, initial_guess_bool=False, bounds=False):
@@ -244,38 +253,35 @@ class TGAnalysis:
                     model_idx = model_idxs[i]
             
             if model_idx == 1:
+                # Params: amp1, t0, tau, sigma, amp2
                 model = self.model1
-                initial_guess = [0.05,0, 0.01, 0.01, 0.05] 
+                initial_guess = [0.05, 0, 0.1, 0.01, 0.05] 
 
-                lower_bounds = [0, 0, 0, 0, 0]
-                upper_bounds = [0.5, np.inf, np.inf, np.inf, np.inf]
+                lower_bounds = [0, -np.inf, 0.1, 0, 0]
+                upper_bounds = [1.0, np.inf, np.inf, np.inf, np.inf]
 
             elif model_idx == 2:
+                # Params: amp1, t0, k_tau, sigma, amp2, omega, phi, amp3, k
                 model = self.model2
 
-                y = tgsignal[time > 2.0]
-                # assume uniform sampling
-                dt = time[1] - time[0]
-                y0 = y - np.mean(y)
-                Y = np.fft.rfft(y0)
-                freqs = np.fft.rfftfreq(len(y0), d=dt)
-                k = np.argmax(np.abs(Y[1:])) + 1   # ignore DC at index 0
-                f_dom = freqs[k]
-                omega_dom = 2*np.pi*f_dom
-                phi_dom = np.angle(Y[k]) % (2*np.pi)    
+                omega_dom = 0.1
+                phi_dom = 1.1
+                initial_guess = [0.05, 0, 2, 0.01, 0.05, omega_dom, phi_dom, 0.05, 0.001] 
 
-                initial_guess = [0.01, 0, 0.01, 0.01, 0.05, omega_dom, phi_dom, 0.05, 0.001] 
-
-                lower_bounds = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-                upper_bounds = [np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, 2*np.pi, 2*np.pi, np.inf]
+                lower_bounds = [0, -np.inf, 0, 0, 0, 0, 0, 0, 0]
+                upper_bounds = [1.0, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf]
 
             elif model_idx == 3:
+                # Params: amp1, amp2, amp3, amp4, t0, k1, k2, sigma, omega, phi
+
+                omega_dom = 1.1
+                phi_dom = 1.0  
                 model = self.model3
+                initial_guess = [0.05, 0.05, 0.05, 0.05, 0, 2, 2, 0.01, omega_dom, phi_dom] 
 
-                initial_guess = [0.001, 0, 0.01, 0.01, 0.05, 0.05, 0.05] 
+                lower_bounds = [0, 0, 0, 0, -np.inf, 0, 0, 0, 0, 0]
+                upper_bounds = [1.0, 1.0, 1.0, 1.0, np.inf, 10, 10, np.inf, np.inf, 2*np.pi]
 
-                lower_bounds = [0, 0, 0, 0, 0, 0, 0]
-                upper_bounds = [2*np.pi, np.inf, np.inf, np.inf, np.inf, 2*np.pi, 2*np.pi]
             else:
                 raise ValueError("Invalid model index")
 
@@ -314,60 +320,42 @@ class TGAnalysis:
 
             if model_idx == 1:
                 params = {
-                    "amp1": popt[0],
-                    "t0": popt[1],
-                    "tau": popt[2],
-                    "sigma": popt[3],
-                    "amp2": popt[4],
-                    "perr_amp1": perr[0],
-                    "perr_t0": perr[1],
-                    "perr_tau": perr[2],
-                    "perr_sigma": perr[3],
-                    "perr_amp2": perr[4]
+                    "amp1": [popt[0], perr[0], "Amplitude 1 (a.u.)", "Amplitude 1"],
+                    "t0": [popt[1], perr[1], r"$t_0$(ps)", "Time 0"],
+                    "tau": [(1/popt[2])*1000, (perr[2]/popt[2]**2)*1000, "Decay time (fs)", "Decay time"],
+                    "sigma": [popt[3], perr[3], r"$\sigma$(ps)", "Sigma"],
+                    "amp2": [popt[4], perr[4], "Amplitude 2 (a.u.)", "Amplitude 2"]
                 }
 
             elif model_idx == 2:
                 params = {
-                    "amp1": popt[0],
-                    "t0": popt[1],
-                    "tau": popt[2],
-                    "sigma": popt[3],
-                    "amp2": popt[4],
-                    "omega": popt[5],
-                    "phi": popt[6],
-                    "amp3": popt[7],
-                    "k": popt[8],
-                    "perr_amp1": perr[0],
-                    "perr_t0": perr[1],
-                    "perr_tau": perr[2],
-                    "perr_sigma": perr[3],
-                    "perr_amp2": perr[4],
-                    "perr_omega": perr[5],
-                    "perr_phi": perr[6],
-                    "perr_amp3": perr[7],
-                    "perr_k": perr[8]
+                    "amp1": [popt[0], perr[0], "Amplitude 1 (a.u.)", "Amplitude 1"],
+                    "t0": [popt[1], perr[1], r"$t_0$(ps)", "Time 0"],
+                    "tau": [(1/popt[2])*1000, (perr[2]/popt[2]**2)*1000, "Decay time (fs)", "Decay time"],
+                    "sigma": [popt[3], perr[3], r"$\sigma$(ps)", "Sigma"],
+                    "amp2": [popt[4], perr[4], "Amplitude 2 (a.u.)", "Amplitude 2"],
+                    "omega": [popt[5], perr[5], r"$\omega$(rad/ps)", "Omega"],
+                    "phi": [popt[6], perr[6], r"$\phi$(rad)", "Phi"],
+                    "amp3": [popt[7], perr[7], "Amplitude 3 (a.u.)", "Amplitude 3"],
+                    "tau2": [(1/popt[8])*1000, (perr[8]/popt[8]**2)*1000, "Decay time 2 (fs)", "Decay time 2"]
                 }
 
             elif model_idx == 3:
                 params = {
-                    "amp1": popt[0],
-                    "t0": popt[1],
-                    "tau": popt[2],
-                    "tau2": popt[3],
-                    "sigma": popt[4],
-                    "amp2": popt[5],
-                    "amp3": popt[6],
-                    "perr_amp1": perr[0],
-                    "perr_t0": perr[1],
-                    "perr_tau": perr[2],
-                    "perr_tau2": perr[3],
-                    "perr_sigma": perr[4],
-                    "perr_amp2": perr[5],
-                    "perr_amp3": perr[6]
+                    "amp1": [popt[0], perr[0], "Amplitude 1 (a.u.)", "Amplitude 1"],
+                    "amp2": [popt[1], perr[1], "Amplitude 2 (a.u.)", "Amplitude 2"],
+                    "amp3": [popt[2], perr[2], "Amplitude 3 (a.u.)", "Amplitude 3"],
+                    "amp4": [popt[3], perr[3], "Amplitude 4 (a.u.)", "Amplitude 4"],
+                    "t0": [popt[4], perr[4], r"$t_0$(ps)", "Time 0"],
+                    "tau": [(1/popt[5])*1000, (perr[5]/popt[5]**2)*1000, "Decay time (fs)", "Decay time"],
+                    "tau2": [(1/popt[6])*1000, (perr[6]/popt[6]**2)*1000, "Decay time 2 (fs)", "Decay time 2"],
+                    "sigma": [popt[7], perr[7], r"$\sigma$(ps)", "Sigma"],
+                    "omega": [popt[8], perr[8], r"$\omega$(rad/ps)", "Omega"],
+                    "phi": [popt[9], perr[9], r"$\phi$(rad)", "Phi"]
                 }
 
-            self.taus_fit = np.append(self.taus_fit, params["tau"])
-            self.errors_tau_fit = np.append(self.errors_tau_fit, params["perr_tau"])
+            self.taus_fit = np.append(self.taus_fit, params["tau"][0])
+            self.errors_tau_fit = np.append(self.errors_tau_fit, params["tau"][1])
             self.params_fit.append(params)
 
     def plot_phase_space(self):
@@ -423,35 +411,32 @@ class TGAnalysis:
                 linestyle="-",
                 linewidth=1.5,
             )
-            ax_main.set_title(self.scans[i] + rf" - $\chi^2$ = {self.chi2_fit[i]:.4f}, $R^2$ = {self.r2_fit[i]:.4f}")
+            ax_main.set_title(self.scans[i] + " - E: " + f"{self.energies[i]:.1f} eV, I: {self.intensities[i]:.1f} $\\mu$J" + "\n" + rf"$\chi^2$/dof = {self.chi2_fit[i]:.4f}, $R^2$ = {self.r2_fit[i]:.4f}")
             ax_main.set_ylabel("TG Signal")
             ax_main.grid(linestyle="--", alpha=0.5)
             ax_main.tick_params(labelbottom=False)
 
-            rel_pct = np.where(
-                time < 0.0,
-                0.0,
-                100.0 * np.abs(y_data - y_fit_s) / np.abs(y_data),
-            )
+            rel_pct = y_data - y_fit_s
+        
             ax_res.plot(time, rel_pct, color="green", linewidth=1.0)
             ax_res.set_xlabel("Time (ps)")
-            ax_res.set_ylabel(r"Rel.\ err.\ (\%)", fontsize=8)
+            ax_res.set_ylabel(r"Rel.\ Diff.\ (a.u.)", fontsize=8)
             ax_res.tick_params(axis="both", labelsize=8)
             ax_res.grid(linestyle="--", alpha=0.5)
 
         fig.tight_layout()
         plt.show()
 
-    def plot_taus_vs_energy(self):
+    def plot_params_vs_energy(self, param_name, errors_bool=False):
         """Plot fitted decay times vs energy with absorbance references."""
         
         data_Co2plus = np.genfromtxt("/Users/manuelfernandosanchezalarcon/Desktop/Trieste_Project/Transient_Grating/transient_grating_project/external_files/Co2plus_absorbance.txt")
         data_Co3plus = np.genfromtxt("/Users/manuelfernandosanchezalarcon/Desktop/Trieste_Project/Transient_Grating/transient_grating_project/external_files/Co3plus_absorbance.txt")
         data_Co3O4 = np.genfromtxt("/Users/manuelfernandosanchezalarcon/Desktop/Trieste_Project/Transient_Grating/transient_grating_project/external_files/Co3O4_absorbance.txt")
         
-        energy_Co2, Co2_absorbance = data_Co2plus[:,0], data_Co2plus[:,1]
-        energy_Co3, Co3_absorbance = data_Co3plus[:,0], data_Co3plus[:,1]
-        energy_Co3O4, Co3O4_absorbance = data_Co3O4[:,0], data_Co3O4[:,1]
+        energy_Co2, Co2_absorbance = data_Co2plus[:,0]-0.4, data_Co2plus[:,1]
+        energy_Co3, Co3_absorbance = data_Co3plus[:,0]-0.4, data_Co3plus[:,1]
+        energy_Co3O4, Co3O4_absorbance = data_Co3O4[:,0]-0.4, data_Co3O4[:,1]
         
         fig, ax1 = plt.subplots(figsize=(8, 5))
         
@@ -467,23 +452,28 @@ class TGAnalysis:
         
         # --- Right Y axis: Decay Time ---
         ax2 = ax1.twinx()
-        
-        ax2.errorbar(self.energies, self.taus_fit * 1000, yerr=self.errors_tau_fit * 0,
-                     fmt='o-',
-                     color='blue',
-                     ecolor='blue',
-                     capsize=5)
-        
-        ax2.set_ylabel("Decay Time (fs)", color='blue')
+
+        param = np.array([self.params_fit[i][param_name][0] for i in range(len(self.params_fit))])
+        label_param = self.params_fit[0][param_name][2]
+        label_title = self.params_fit[0][param_name][3]
+        if errors_bool:
+            errors = np.array([self.params_fit[i][param_name][1] for i in range(len(self.params_fit))])
+            ax2.errorbar(self.energies, param, yerr=errors, fmt='o-', color='blue', ecolor='blue', capsize=5)
+        else:
+            errors = 0
+            ax2.plot(self.energies, param, 'o-', color='blue')
+            
+            
+        ax2.set_ylabel(label_param, color='blue')
         ax2.tick_params(axis='y', colors='blue')
         ax2.spines['right'].set_color('blue')  # Right spine also in blue
-        
+
         # --- Legend (combine both axes) ---
         lines1, labels1 = ax1.get_legend_handles_labels()
         lines2, labels2 = ax2.get_legend_handles_labels()
         ax1.legend(lines1 + lines2, labels1 + labels2, loc='best')
         
-        plt.title("Decay Time vs Energy")
+        plt.title(f"{label_title} vs Energy")
         plt.tight_layout()
         plt.show()
 
@@ -560,7 +550,7 @@ class TGAnalysis:
         fig.tight_layout(rect=[0, 0.08, 1, 1])
         plt.show()
 
-    def plot_taus_all_models(self, models_config, errors_bool=False):
+    def plot_params_all_models(self, models_config, param_name, errors_bool=False, y_limits=None):
         """Compare fitted decay times for multiple model configurations.
 
         Parameters
@@ -574,13 +564,17 @@ class TGAnalysis:
         plt.figure(figsize=(8, 5))
         for model_config in models_config:
             self.get_fit_parameters(model_idxs=model_config["model_idxs"], initial_guess_bool=model_config["initial_guess_bool"], bounds=model_config["bounds"])
-            #plt.plot(self.energies, self.taus_fit * 1000, label=model_config["model_idxs"])
+            param = np.array([self.params_fit[i][param_name][0] for i in range(len(self.params_fit))])
             if errors_bool:
-                plt.errorbar(self.energies, self.taus_fit * 1000, yerr=self.errors_tau_fit * 1000, fmt='o-', capsize=5)
+                errors = np.array([self.params_fit[i][param_name][1] for i in range(len(self.params_fit))])
+                plt.errorbar(self.energies, param, yerr=errors, fmt='o-', capsize=5, label=model_config["label_model"])
             else:
-                plt.plot(self.energies, self.taus_fit * 1000, label=model_config["model_idxs"])
+                errors = 0
+                plt.plot(self.energies, param, 'o-', label=model_config["label_model"])
 
         plt.grid(linestyle='--', alpha=0.5)
+        if y_limits is not None:
+            plt.ylim(y_limits[0], y_limits[1])
         plt.legend()
         plt.show()
             
