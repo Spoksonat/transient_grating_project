@@ -25,12 +25,13 @@ This folder contains the analysis implementation and interactive notebooks.
 ## Current notebook flow (`results_tg.ipynb`)
 
 1. Load metadata JSON and initialize `TGAnalysis`.
-2. Inspect phase space (`plot_phase_space`).
-3. Select scans (`get_data_scan`).
-4. Fit one model or per-scan models (`get_fit_parameters`).
-5. Visualize fits (`plot_fits`).
-6. Plot any fitted parameter vs energy (`plot_params_vs_energy`).
-7. Compare models (`plot_params_all_models`).
+2. Define analysis mode (`constant_E` or `constant_I`) and target fit parameter.
+3. Inspect phase space (`plot_phase_space`, optionally with error bars).
+4. Select scans (`get_data_scan`) according to the chosen mode.
+5. Fit one model or per-scan models (`get_fit_parameters`).
+6. Visualize fits (`plot_fits`).
+7. Plot any fitted parameter vs energy (`plot_params_vs_energy`) or vs intensity (`plot_params_vs_intensity`), depending on mode.
+8. Compare models (`plot_params_all_models`) with explicit mode selection.
 
 ## Import note
 

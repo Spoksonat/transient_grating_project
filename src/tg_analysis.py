@@ -88,10 +88,10 @@ class TGAnalysis:
         """
         df_const_E = self.df_scans[(self.df_scans["flag_secure"] == True) & (self.df_scans["Energy_eV"] == energy_eV) & (self.df_scans["repeated"] == False)]
         df_const_E = df_const_E.sort_values(by="XUV_intensity_uJ")
-        scans_const_E = self.df_const_E["Scan"].to_numpy()
-        I_const_E = self.df_const_E["XUV_intensity_uJ"].to_numpy()
-        E_const_E = self.df_const_E["Energy_eV"].to_numpy()
-        filter = self.df_const_E["filter"].to_numpy()
+        scans_const_E = df_const_E["Scan"].to_numpy()
+        I_const_E = df_const_E["XUV_intensity_uJ"].to_numpy()
+        E_const_E = df_const_E["Energy_eV"].to_numpy()
+        filter = df_const_E["filter"].to_numpy()
 
         return scans_const_E, E_const_E, I_const_E, filter
 
@@ -195,10 +195,8 @@ class TGAnalysis:
         function = amp1*exp1*exp2*(1 + erf1) + amp2*(1 + erf2) + amp3*exp3*exp4*(1 + erf3)*osc_factor 
         return function
 
-    def model3(self, t, amp1, amp2, amp3, amp4, t0, k1, k2, sigma, omega, phi):
+    def model3(self, t, amp1, amp2, amp3, amp4, t0, k1, k2, k10, k20, sigma, omega, phi):
         """Model 3: multi-exponential decay: two decay plus one damped oscillatory contribution."""
-        k10 = k1 + 1/t0
-        k20 = k2 + 1/t0
         exp1 = np.exp(-(t - t0)*k1)
         exp2 = np.exp(-(t - t0)*k2)
         exp3 = np.exp(-(t - t0)*k10)
@@ -252,11 +250,11 @@ class TGAnalysis:
                     model_idx = model_idxs[i]
             
             if model_idx == 1:
-                # Params: amp1, t0, tau, sigma, amp2
+                # Params: amp1, t0, k_tau, sigma, amp2
                 model = self.model1
-                initial_guess = [0.05, 0, 0.1, 0.01, 0.05] 
+                initial_guess = [0.05, 0, 10, 0.01, 0.05] 
 
-                lower_bounds = [0, -np.inf, 0.1, 0, 0]
+                lower_bounds = [0, -np.inf, 0.0, 0, 0]
                 upper_bounds = [1.0, np.inf, np.inf, np.inf, np.inf]
 
             elif model_idx == 2:
@@ -265,21 +263,21 @@ class TGAnalysis:
 
                 omega_dom = 0.1
                 phi_dom = 1.1
-                initial_guess = [0.05, 0, 2, 0.01, 0.05, omega_dom, phi_dom, 0.05, 0.001] 
+                initial_guess = [0.05, 0, 3, 0.01, 0.05, omega_dom, phi_dom, 0.05, 1] 
 
-                lower_bounds = [0, -np.inf, 0, 0, 0, 0, 0, 0, 0]
-                upper_bounds = [1.0, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf]
+                lower_bounds = [0, -np.inf, 3, 0, 0, 0, 0, 0, 0]
+                upper_bounds = [1.0, np.inf, 30, np.inf, np.inf, np.inf, np.inf, np.inf, np.inf]
 
             elif model_idx == 3:
-                # Params: amp1, amp2, amp3, amp4, t0, k1, k2, sigma, omega, phi
+                # Params: amp1, amp2, amp3, amp4, t0, k1, k2, k10, k20, sigma, omega, phi
 
-                omega_dom = 1.1
-                phi_dom = 1.0  
+                omega_dom = 0.1
+                phi_dom = 4.0  
                 model = self.model3
-                initial_guess = [0.05, 0.05, 0.05, 0.05, 0, 2, 2, 0.01, omega_dom, phi_dom] 
+                initial_guess = [0.2, 0.2, 0.2, 0.2, 0.01, 3, 2.5, 2.5, 2.5, 0.1, omega_dom, phi_dom] 
 
-                lower_bounds = [0, 0, 0, 0, -np.inf, 0, 0, 0, 0, 0]
-                upper_bounds = [1.0, 1.0, 1.0, 1.0, np.inf, 10, 10, np.inf, np.inf, 2*np.pi]
+                lower_bounds = [0, 0, 0, 0, -np.inf, 3, 2.5, 2.5, 2.5, 0, 0, 0]
+                upper_bounds = [np.inf, np.inf, np.inf, np.inf, np.inf, 30, 10, 10, 10, np.inf, np.inf, 2*np.pi]
 
             else:
                 raise ValueError("Invalid model index")
@@ -348,26 +346,36 @@ class TGAnalysis:
                     "t0": [popt[4], perr[4], r"$t_0$(ps)", "Time 0"],
                     "tau": [(1/popt[5])*1000, (perr[5]/popt[5]**2)*1000, "Decay time (fs)", "Decay time"],
                     "tau2": [(1/popt[6])*1000, (perr[6]/popt[6]**2)*1000, "Decay time 2 (fs)", "Decay time 2"],
-                    "sigma": [popt[7], perr[7], r"$\sigma$(ps)", "Sigma"],
-                    "omega": [popt[8], perr[8], r"$\omega$(rad/ps)", "Omega"],
-                    "phi": [popt[9], perr[9], r"$\phi$(rad)", "Phi"]
+                    "tau10": [(1/popt[7])*1000, (perr[7]/popt[7]**2)*1000, "Decay time 10 (fs)", "Decay time 10"],
+                    "tau20": [(1/popt[8])*1000, (perr[8]/popt[8]**2)*1000, "Decay time 20 (fs)", "Decay time 20"],
+                    "sigma": [popt[9], perr[9], r"$\sigma$(ps)", "Sigma"],
+                    "omega": [popt[10], perr[10], r"$\omega$(rad/ps)", "Omega"],
+                    "phi": [popt[11], perr[11], r"$\phi$(rad)", "Phi"]
                 }
 
             self.taus_fit = np.append(self.taus_fit, params["tau"][0])
             self.errors_tau_fit = np.append(self.errors_tau_fit, params["tau"][1])
             self.params_fit.append(params)
 
-    def plot_phase_space(self):
+    def plot_phase_space(self, plot_names=False, errors_bool=False):
         """Plot the phase-space coverage of secure, non-repeated scans."""
+        errors_e = 0.03
+        errors_i = 0.5
         df_phase_space = self.df_scans[(self.df_scans["flag_secure"] == True) & (self.df_scans["repeated"] == False)]
         scans_phase_space = df_phase_space["Scan"].to_numpy()
         E_phase_space = df_phase_space["Energy_eV"].to_numpy()
         I_phase_space = df_phase_space["XUV_intensity_uJ"].to_numpy()
-
+        
         plt.figure(figsize=(6, 5))
-        plt.scatter(E_phase_space, I_phase_space, marker='o', color="olive")
+        
         for i, (E, I) in enumerate(zip(E_phase_space, I_phase_space)):
-            plt.annotate("S" + scans_phase_space[i][4:], (E, I), xytext=(5, 5), textcoords='offset points', fontsize=8)
+            if errors_bool:
+                plt.errorbar(E, I, xerr=errors_e, yerr=errors_i, fmt='o', capsize=5, alpha=0.6)
+            else:
+                plt.scatter(E, I, marker='o', alpha=0.6)
+
+            if plot_names:
+                plt.annotate("S" + scans_phase_space[i][4:], (E, I), xytext=(5, 5), textcoords='offset points', fontsize=8)
         plt.xlabel("Energy (eV)")
         plt.ylabel("Intensity (uJ)")
         plt.title("Phase Space")
@@ -417,7 +425,7 @@ class TGAnalysis:
 
             rel_pct = y_data - y_fit_s
         
-            ax_res.plot(time, rel_pct, color="green", linewidth=1.0)
+            ax_res.scatter(time, rel_pct, color="green", s=8)
             ax_res.set_xlabel("Time (ps)")
             ax_res.set_ylabel(r"Rel.\ Diff.\ (a.u.)", fontsize=8)
             ax_res.tick_params(axis="both", labelsize=8)
@@ -476,6 +484,28 @@ class TGAnalysis:
         plt.tight_layout()
         plt.show()
 
+    def plot_params_vs_intensity(self, param_name, errors_bool=False):
+        """Plot fitted decay times vs intensity."""
+        
+        plt.figure(figsize=(8, 5))
+
+        param = np.array([self.params_fit[i][param_name][0] for i in range(len(self.params_fit))])
+        label_param = self.params_fit[0][param_name][2]
+        label_title = self.params_fit[0][param_name][3]
+        if errors_bool:
+            errors = np.array([self.params_fit[i][param_name][1] for i in range(len(self.params_fit))])
+            plt.errorbar(self.intensities, param, yerr=errors, fmt='o-', color='blue', ecolor='blue', capsize=5)
+        else:
+            errors = 0
+            plt.plot(self.intensities, param, 'o-', color='blue')
+            
+            
+        plt.ylabel(label_param)
+        plt.xlabel(r"Intensity ($\mu$J)")
+        plt.title(f"{label_title} vs Intensity")
+        plt.tight_layout()
+        plt.show()
+
     def plot_stacked_signals(self, limits_time=None, limits_signal=None, ylog_scale = False, plot_ind=None, data_over_fit=False):
         """Plot stacked TG signals and optionally stacked fits.
 
@@ -495,35 +525,36 @@ class TGAnalysis:
         fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
         ax_data, ax_fit = axes
         for i, (time, tgsignal) in enumerate(zip(self.time_scans, self.tgsignal_scans)):
+            t_shift = self.times_fit[i][np.argmax(self.tgsignals_fit[i])]
             if plot_ind is None:
-                ax_data.plot(time, tgsignal, label=f"S{self.scans[i][4:]}, E={self.energies[i]:.1f} eV, I={self.intensities[i]:.1f} $\\mu$J")
+                ax_data.plot(time - t_shift, tgsignal, label=f"S{self.scans[i][4:]}, E={self.energies[i]:.1f} eV, I={self.intensities[i]:.1f} $\\mu$J")
                 if hasattr(self, "times_fit") and hasattr(self, "tgsignals_fit"):
                     ax_fit.plot(
-                        self.times_fit[i],
+                        self.times_fit[i] - t_shift,
                         self.tgsignals_fit[i],
                         label=f"S{self.scans[i][4:]}, E={self.energies[i]:.1f} eV, I={self.intensities[i]:.1f} $\\mu$J",
                     )
             else:
                 if plot_ind == "all":
-                    ax_data.plot(time, tgsignal, label=f"S{self.scans[i][4:]}, E={self.energies[i]:.1f} eV, I={self.intensities[i]:.1f} $\\mu$J")
+                    ax_data.plot(time - t_shift, tgsignal, label=f"S{self.scans[i][4:]}, E={self.energies[i]:.1f} eV, I={self.intensities[i]:.1f} $\\mu$J")
                     if hasattr(self, "times_fit") and hasattr(self, "tgsignals_fit"):
                         ax_fit.plot(
-                            self.times_fit[i],
+                            self.times_fit[i] - t_shift,
                             self.tgsignals_fit[i],
                             label=f"S{self.scans[i][4:]}, E={self.energies[i]:.1f} eV, I={self.intensities[i]:.1f} $\\mu$J",
                         )
                 else:
                     if i in plot_ind:
-                        ax_data.plot(time, tgsignal, label=f"S{self.scans[i][4:]}, E={self.energies[i]:.1f} eV, I={self.intensities[i]:.1f} $\\mu$J")
+                        ax_data.plot(time - t_shift, tgsignal, label=f"S{self.scans[i][4:]}, E={self.energies[i]:.1f} eV, I={self.intensities[i]:.1f} $\\mu$J")
                         if hasattr(self, "times_fit") and hasattr(self, "tgsignals_fit"):
                             ax_fit.plot(
-                                self.times_fit[i],
+                                self.times_fit[i] - t_shift,
                                 self.tgsignals_fit[i],
                                 label=f"S{self.scans[i][4:]}, E={self.energies[i]:.1f} eV, I={self.intensities[i]:.1f} $\\mu$J",
                             )
                             if data_over_fit:
-                                ax_fit.scatter(time, tgsignal, label=f"S{self.scans[i][4:]}, Experimental data")
-                                ax_fit.plot(self.times_fit[i], np.exp(-(self.times_fit[i] - self.params_fit[i]["t0"])/self.params_fit[i]["tau"]) + np.mean(tgsignal[time > 2.5]), color="red", linestyle="--")
+                                ax_fit.scatter(time - t_shift, tgsignal, label=f"S{self.scans[i][4:]}, Experimental data")
+                                ax_fit.plot(self.times_fit[i] - t_shift, np.exp(-(self.times_fit[i] - t_shift)/self.params_fit[i]["tau"][0]) + np.mean(tgsignal[time - t_shift > 2.5]), color="red", linestyle="--")
 
         ax_data.set_xlabel("Time (ps)")
         ax_data.set_ylabel("TG Signal")
@@ -549,7 +580,7 @@ class TGAnalysis:
         fig.tight_layout(rect=[0, 0.08, 1, 1])
         plt.show()
 
-    def plot_params_all_models(self, models_config, param_name, errors_bool=False, y_limits=None):
+    def plot_params_all_models(self, models_config, param_name, mode, errors_bool=False, y_limits=None):
         """Compare fitted decay times for multiple model configurations.
 
         Parameters
@@ -558,20 +589,34 @@ class TGAnalysis:
             List of fitting configurations passed to ``get_fit_parameters``.
         errors_bool : bool, optional
             If ``True``, include error bars for fitted ``tau`` values.
+        mode : str
+            "energy" or "intensity"
         """
-
+        if mode == "constant_E":
+            x_data = self.intensities
+            x_label = r"Intensity ($\mu$J)"
+            title = f"{self.params_fit[0][param_name][-1]} vs Energy"
+        elif mode == "constant_I":
+            x_data = self.energies
+            x_label = "Energy (eV)"
+            title = f"{self.params_fit[0][param_name][-1]} vs Intensity"
+        else:
+            raise ValueError("Invalid mode")
         plt.figure(figsize=(8, 5))
         for model_config in models_config:
             self.get_fit_parameters(model_idxs=model_config["model_idxs"], initial_guess_bool=model_config["initial_guess_bool"], bounds=model_config["bounds"])
             param = np.array([self.params_fit[i][param_name][0] for i in range(len(self.params_fit))])
             if errors_bool:
                 errors = np.array([self.params_fit[i][param_name][1] for i in range(len(self.params_fit))])
-                plt.errorbar(self.energies, param, yerr=errors, fmt='o-', capsize=5, label=model_config["label_model"])
+                plt.errorbar(x_data, param, yerr=errors, fmt='o-', capsize=5, label=model_config["label_model"], color=model_config["color"])
             else:
                 errors = 0
-                plt.plot(self.energies, param, 'o-', label=model_config["label_model"])
+                plt.plot(x_data, param, 'o-', label=model_config["label_model"], color=model_config["color"])
 
         plt.grid(linestyle='--', alpha=0.5)
+        plt.xlabel(x_label)
+        plt.ylabel(self.params_fit[0][param_name][2])
+        plt.title(title)
         if y_limits is not None:
             plt.ylim(y_limits[0], y_limits[1])
         plt.legend()

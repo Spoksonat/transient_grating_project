@@ -13,7 +13,7 @@
     "Energy_eV": 63.6,
     "XUV_intensity_uJ": 8.1,
     "flag_secure": true,
-    "repeated": false,  
+    "repeated": true,  
     "filter": false
   },
   "Scan040": {

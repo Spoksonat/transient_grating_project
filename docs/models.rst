@@ -63,12 +63,12 @@ where:
 Model 3 (``model3``)
 --------------------
 
-Extended multi-component form with two decay rates and an oscillatory
-contribution:
+Extended multi-component form with two decay rates, two additional damped
+oscillatory rates, and a Gaussian-convolved step term:
 
 .. math::
 
-   \text{with } k_{10}=k_1+\frac{1}{t_0},\quad k_{20}=k_2+\frac{1}{t_0}
+   \text{with independent rates } k_1,\;k_2,\;k_{10},\;k_{20}
 
 .. math::
 

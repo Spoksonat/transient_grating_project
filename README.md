@@ -31,10 +31,11 @@ transient_grating_project/
 The current code/notebook workflow includes:
 
 - TG signal preprocessing with baseline subtraction and normalization by total area (`signal / sum(signal)`).
-- Scan selection at fixed intensity or fixed energy from JSON metadata.
+- Mode-based scan selection at fixed intensity or fixed energy from JSON metadata.
 - Three fit models with parameter extraction and propagated uncertainties.
 - Generic parameter-vs-energy plotting via `plot_params_vs_energy(param_name=...)`.
-- Multi-model comparison via `plot_params_all_models(...)`.
+- Parameter-vs-intensity plotting via `plot_params_vs_intensity(param_name=...)`.
+- Multi-model comparison via `plot_params_all_models(..., mode=...)`.
 
 ## Data contract
 
@@ -60,13 +61,23 @@ Example usage (same logic as notebook):
 from tg_analysis import TGAnalysis
 
 analysis = TGAnalysis("external_files/parameters_CoOx12.json")
-analysis.plot_phase_space()
+mode = "constant_I"
+param_name = "tau"
 
-analysis.get_data_scan({"E": "all", "I": 2.0})
-analysis.get_fit_parameters(model_idxs=1, initial_guess_bool=True, bounds=True)
+analysis.plot_phase_space(errors_bool=True)
+
+if mode == "constant_E":
+    analysis.get_data_scan({"E": 63.6, "I": "all"})
+else:
+    analysis.get_data_scan({"E": "all", "I": 2.0})
+
+analysis.get_fit_parameters(model_idxs=2, initial_guess_bool=True, bounds=True)
 
 analysis.plot_fits()
-analysis.plot_params_vs_energy(param_name="tau", errors_bool=True)
+if mode == "constant_E":
+    analysis.plot_params_vs_intensity(param_name=param_name, errors_bool=False)
+else:
+    analysis.plot_params_vs_energy(param_name=param_name, errors_bool=False)
 ```
 
 ## Documentation
