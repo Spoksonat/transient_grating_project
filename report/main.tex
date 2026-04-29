@@ -1,0 +1,57 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+
+\geometry{top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
+
+\title{Transient Grating Results Report}
+\author{Manuel Fernando S\'anchez Alarc\'on}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\chapter{Introduction}
+This report summarizes the current status of transient grating analysis.
+It is intended as the companion document for the code and notebook workflow in this repository.
+
+\chapter{Data and Workflow}
+\section{Dataset}
+Describe here the scans, energies, and intensities used in the current analysis campaign.
+
+\section{Processing Pipeline}
+Document the preprocessing and fitting steps implemented in \texttt{src/tg\_analysis.py}.
+
+\chapter{Results}
+\section{Main Observations}
+Add quantitative findings and their uncertainty estimates.
+
+\section{Figures}
+Insert figures exported from the analysis scripts and notebook.
+For example:
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{figures/example.png}
+    \caption{Placeholder for transient grating analysis output.}
+    \label{fig:tg-placeholder}
+\end{figure}
+
+\chapter{Conclusions}
+Summarize the physical interpretation of the fitted parameters and open points for follow-up.
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}

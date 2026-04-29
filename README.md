@@ -14,6 +14,7 @@ transient_grating_project/
 ├── pyproject.toml
 ├── requirements.txt
 ├── docs/
+├── report/
 ├── src/
 │   ├── README.md
 │   ├── tg_analysis.py
@@ -25,6 +26,8 @@ transient_grating_project/
     ├── Co3plus_absorbance.txt
     └── Co3O4_absorbance.txt
 ```
+
+`report/` contains the LaTeX report workspace for documenting scientific results derived from this project.
 
 ## What changed in the current analysis workflow
 
