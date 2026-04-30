@@ -357,7 +357,7 @@ class TGAnalysis:
             self.errors_tau_fit = np.append(self.errors_tau_fit, params["tau"][1])
             self.params_fit.append(params)
 
-    def plot_phase_space(self, plot_names=False, errors_bool=False):
+    def plot_phase_space(self, plot_names=False, errors_bool=False, save_path=None):
         """Plot the phase-space coverage of secure, non-repeated scans."""
         errors_e = 0.03
         errors_i = 0.5
@@ -381,9 +381,13 @@ class TGAnalysis:
         plt.title("Phase Space")
         plt.grid(linestyle='--', alpha=0.5)
         plt.xlim(E_phase_space.min()-2, E_phase_space.max()+2)
-        plt.show()
+        if save_path is not None:
+            fig = plt.gcf()
+            fig.savefig(save_path)
+        else:
+            plt.show()
 
-    def plot_fits(self):
+    def plot_fits(self, save_path=None):
         """Plot data vs fitted curves and relative error per scan."""
         if not hasattr(self, "times_fit") or not hasattr(self, "tgsignals_fit"):
             raise ValueError("Fit data not found. Run get_fit_parameters() first.")
@@ -432,9 +436,12 @@ class TGAnalysis:
             ax_res.grid(linestyle="--", alpha=0.5)
 
         fig.tight_layout()
-        plt.show()
+        if save_path is not None:
+            fig.savefig(save_path)
+        else:
+            plt.show()
 
-    def plot_params_vs_energy(self, param_name, errors_bool=False):
+    def plot_params_vs_energy(self, param_name, errors_bool=False, save_path=None):
         """Plot fitted decay times vs energy with absorbance references."""
         
         data_Co2plus = np.genfromtxt("/Users/manuelfernandosanchezalarcon/Desktop/Trieste_Project/Transient_Grating/transient_grating_project/external_files/Co2plus_absorbance.txt")
@@ -482,9 +489,12 @@ class TGAnalysis:
         
         plt.title(f"{label_title} vs Energy")
         plt.tight_layout()
-        plt.show()
+        if save_path is not None:
+            fig.savefig(save_path)
+        else:
+            plt.show()
 
-    def plot_params_vs_intensity(self, param_name, errors_bool=False):
+    def plot_params_vs_intensity(self, param_name, errors_bool=False, save_path=None):
         """Plot fitted decay times vs intensity."""
         
         plt.figure(figsize=(8, 5))
@@ -504,9 +514,12 @@ class TGAnalysis:
         plt.xlabel(r"Intensity ($\mu$J)")
         plt.title(f"{label_title} vs Intensity")
         plt.tight_layout()
-        plt.show()
+        if save_path is not None:
+            plt.savefig(save_path)
+        else:
+            plt.show()
 
-    def plot_stacked_signals(self, limits_time=None, limits_signal=None, ylog_scale = False, plot_ind=None, data_over_fit=False):
+    def plot_stacked_signals(self, limits_time=None, limits_signal=None, ylog_scale = False, plot_ind=None, data_over_fit=False, save_path=None):
         """Plot stacked TG signals and optionally stacked fits.
 
         Parameters
@@ -578,9 +591,12 @@ class TGAnalysis:
             ax_data.set_yscale("log")
             ax_fit.set_yscale("log")
         fig.tight_layout(rect=[0, 0.08, 1, 1])
-        plt.show()
+        if save_path is not None:
+            fig.savefig(save_path)
+        else:
+            plt.show()
 
-    def plot_params_all_models(self, models_config, param_name, mode, errors_bool=False, y_limits=None):
+    def plot_params_all_models(self, models_config, param_name, mode, errors_bool=False, y_limits=None, save_path=None):
         """Compare fitted decay times for multiple model configurations.
 
         Parameters
@@ -620,7 +636,10 @@ class TGAnalysis:
         if y_limits is not None:
             plt.ylim(y_limits[0], y_limits[1])
         plt.legend()
-        plt.show()
+        if save_path is not None:
+            plt.savefig(save_path)
+        else:
+            plt.show()
             
 
 

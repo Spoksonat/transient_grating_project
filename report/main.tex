@@ -7,51 +7,350 @@
 \usepackage{xcolor}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
+\usepackage{physics}
 \usepackage{float}
 \usepackage{hyperref}
+\usepackage{upgreek}
 \usepackage[numbers,sort&compress]{natbib}
 
 \geometry{top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
 
-\title{Transient Grating Results Report}
-\author{Manuel Fernando S\'anchez Alarc\'on}
-\date{\today}
+\definecolor{titleblack}{RGB}{0,0,0}
+\definecolor{titlewhite}{RGB}{255,255,255}
+\newcommand{\reporttitle}{Report: Transient Grating Project}
+\newcommand{\reportauthor}{Manuel Fernando S\'anchez Alarc\'on}
+\newcommand{\reportdate}{\today}
+\newcommand{\logoUni}{logos/logo_trieste.png}
+\newcommand{\logoChirax}{logos/logo_chirax.png}
 
 \begin{document}
 
-\maketitle
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+    \pagecolor{titleblack}
+    \color{titlewhite}
+    \begin{center}
+        \vspace*{2cm}
+
+        \includegraphics[width=0.25\textwidth]{\logoUni} \hspace{2cm}
+        \includegraphics[width=0.4\textwidth]{\logoChirax}
+
+        \vspace{2cm}
+
+        {\Huge \textbf{\reporttitle}}
+
+        \vspace{1.5cm}
+
+        {\Large \reportauthor}
+
+        \vfill
+
+        {\large \reportdate}
+    \end{center}
+\end{titlepage}
+
+\clearpage
+\hypersetup{pageanchor=true}
+\pagenumbering{arabic}
+
+\pagecolor{white}
+\color{black}
 \tableofcontents
 \newpage
 
 \chapter{Introduction}
-This report summarizes the current status of transient grating analysis.
-It is intended as the companion document for the code and notebook workflow in this repository.
+This report summarizes the current status of transient grating signal analysis.
+It is intended as the companion document for the code and notebook workflow in this project.
 
-\chapter{Data and Workflow}
-\section{Dataset}
-Describe here the scans, energies, and intensities used in the current analysis campaign.
+\chapter{Fitting Models}
 
-\section{Processing Pipeline}
-Document the preprocessing and fitting steps implemented in \texttt{src/tg\_analysis.py}.
+For this report, three different models have been implemented and fitted to the data. The models are described in the following sections.
+
+\section{Model 1}
+
+The first model is described by the following equation:
+\begin{align}
+    \begin{split}
+        f(t)
+        &= \qty[A_1 e^{-(t-t_0)/\tau} + A_2]
+        \circledast \frac{1}{\sqrt{2\pi}\sigma} e^{-(t-t_0)^2/(2\sigma^2)} \\
+        &= A_1 e^{-(t-t_0)/\tau} e^{\sigma^2/(2\tau^2)}
+        \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau}{\sqrt{2}\sigma}\right)\right) \\
+        &\quad + A_2 \left(1 + \erf\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right)
+    \end{split}
+\end{align}
+
+\section{Model 2}
+The second model is described by the following equation:
+\begin{align}
+    \begin{split}
+    f(t)
+    &= \qty[A_1 e^{-(t-t_0)/\tau} + A_2 + A_3 e^{-(t-t_0)/\tau_2}\sin(\omega t-\phi)]
+    \circledast \frac{1}{\sqrt{2\pi}\sigma} e^{-(t-t_0)^2/(2\sigma^2)} \\
+    &= A_1 e^{-(t-t_0)/\tau} e^{\sigma^2/(2\tau^2)}
+    \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau}{\sqrt{2}\sigma}\right)\right) \\
+    &\quad + A_2 \left(1 + \erf\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right) \\
+    &\quad + A_3 e^{-(t-t_0)/\tau_2} e^{\sigma^2/(2\tau_2^2)}
+    \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_2}{\sqrt{2}\sigma}\right)\right)
+    (\sin(\omega t-\phi)-\cos(\omega t-\phi)).
+    \end{split}
+    \end{align}
+
+\section{Model 3}
+The third model is described by the following equation:
+\begin{align}
+    \begin{split}
+        f(t) &= \qty[A_1 e^{-(t-t_0)/\tau_1} + A_2 e^{-(t-t_0)/\tau_2} + A_3 (e^{-(t-t_0)/\tau_{20}} - e^{-(t-t_0)/\tau_{10}}) + A_4]\sin(\omega t-\phi) \\
+        &\quad \circledast \frac{1}{\sqrt{2\pi}\sigma} e^{-(t-t_0)^2/(2\sigma^2)} \\
+        &= A_1 e^{-(t-t_0)/\tau_1} e^{\sigma^2/(2\tau_1^2)}
+        \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_1}{\sqrt{2}\sigma}\right)\right) \\
+        &\quad + A_2 e^{-(t-t_0)/\tau_2} e^{\sigma^2/(2\tau_2^2)}
+        \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_2}{\sqrt{2}\sigma}\right)\right) \\
+        &\quad + A_3 e^{-(t-t_0)/\tau_{20}} e^{\sigma^2/(2\tau_{20}^2)}
+        \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_{20}}{\sqrt{2}\sigma}\right)\right)[\sin(\omega t-\phi)-\cos(\omega t-\phi)] \\
+        &\quad - A_3 e^{-(t-t_0)/\tau_{10}} e^{\sigma^2/(2\tau_{10}^2)}
+        \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_{10}}{\sqrt{2}\sigma}\right)\right)[\sin(\omega t-\phi)-\cos(\omega t-\phi)] \\
+        &\quad + A_4 \left(1 + \erf\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right),
+    \end{split}
+\end{align}
+where $\frac{1}{\tau_{20}} = \frac{1}{\tau_2} + \frac{1}{t_{0}}$ and $\frac{1}{\tau_{10}} = \frac{1}{\tau_1} + \frac{1}{t_{0}}$.
 
 \chapter{Results}
-\section{Main Observations}
-Add quantitative findings and their uncertainty estimates.
 
-\section{Figures}
-Insert figures exported from the analysis scripts and notebook.
-For example:
+\section{Phase Space}
+
+The available scans for the dataset CoOx12 are represented by each point in the phase space plot shown in Figure \ref{fig:phase_space}. The phase space plot is a scatter plot of the energy and intensity of the scans.
+
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.8\textwidth]{figures/example.png}
-    \caption{Placeholder for transient grating analysis output.}
-    \label{fig:tg-placeholder}
+    \includegraphics[width=0.8\textwidth]{figures/phase_space.png}
+    \caption{Phase space plot of the available scans for the dataset CoOx12.}
+    \label{fig:phase_space}
 \end{figure}
 
-\chapter{Conclusions}
-Summarize the physical interpretation of the fitted parameters and open points for follow-up.
+\section{Model 1}
 
-\bibliographystyle{unsrtnat}
-\bibliography{references}
+\subsection{Constant Intensity}
+
+In this case, only scans with a constant intensity of 2 $\upmu$J are considered. Each individual signal was fitted with the Model 1 and the results are shown in Figure \ref{fig:fits_constant_I_model1}, together with the corresponding residuals (in green).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/fits_constant_I_model1.png}
+    \caption{Fitted signals for the Model 1 with constant intensity of 2 $\upmu$J. The fitted curve is shown in red, the experimental data is shown in blue, and the residuals are shown in green. Values for the $\chi^2$/dof goodness of fit are shown in the title of each plot, as well as the $R^2$ value.}
+    \label{fig:fits_constant_I_model1}
+\end{figure}
+
+The values of $\tau$ for the Model 1 are shown in Figure \ref{fig:tau_constant_I_model1}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/tau_constant_I_model1.png}
+    \caption{Values of $\tau$ for the Model 1 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
+    \label{fig:tau_constant_I_model1}
+\end{figure}
+
+\subsection{Constant Energy}
+
+In this case, only scans with a constant energy of 63.6 eV are considered. Each individual signal was fitted with the Model 1 and the results are shown in Figure \ref{fig:fits_constant_E_model1}, together with the corresponding residuals (in green).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/fits_constant_E_model1.png}
+    \caption{Fitted signals for the Model 1 with constant energy of 1000 eV. The fitted curve is shown in red, the experimental data is shown in blue, and the residuals are shown in green. Values for the $\chi^2$/dof goodness of fit are shown in the title of each plot, as well as the $R^2$ value.}
+    \label{fig:fits_constant_E_model1}
+\end{figure}
+
+The values of $\tau$ for the Model 1 are shown in Figure \ref{fig:tau_constant_E_model1}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/tau_constant_E_model1.png}
+    \caption{Values of $\tau$ for the Model 1 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
+    \label{fig:tau_constant_E_model1}
+\end{figure}
+
+\section{Model 2}
+
+\subsection{Constant Intensity}
+
+In this case, only scans with a constant intensity of 2 $\upmu$J are considered. Each individual signal was fitted with the Model 2 and the results are shown in Figure \ref{fig:fits_constant_I_model2}, together with the corresponding residuals (in green).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/fits_constant_I_model2.png}
+    \caption{Fitted signals for the Model 2 with constant intensity of 2 $\upmu$J. The fitted curve is shown in red, the experimental data is shown in blue, and the residuals are shown in green. Values for the $\chi^2$/dof goodness of fit are shown in the title of each plot, as well as the $R^2$ value.}
+    \label{fig:fits_constant_I_model2}
+\end{figure}
+
+The values of $\tau$ for the Model 2 are shown in Figure \ref{fig:tau_constant_I_model2}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/tau_constant_I_model2.png}
+    \caption{Values of $\tau$ for the Model 2 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
+    \label{fig:tau_constant_I_model2}
+\end{figure}
+
+The values of $\tau_2$ for the Model 2 are shown in Figure \ref{fig:tau2_constant_I_model2}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/tau2_constant_I_model2.png}
+    \caption{Values of $\tau_2$ for the Model 2 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
+    \label{fig:tau2_constant_I_model2}
+\end{figure}
+
+\subsection{Constant Energy}
+
+In this case, only scans with a constant energy of 63.6 eV are considered. Each individual signal was fitted with the Model 2 and the results are shown in Figure \ref{fig:fits_constant_E_model2}, together with the corresponding residuals (in green).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/fits_constant_E_model2.png}
+    \caption{Fitted signals for the Model 2 with constant energy of 63.6 eV. The fitted curve is shown in red, the experimental data is shown in blue, and the residuals are shown in green. Values for the $\chi^2$/dof goodness of fit are shown in the title of each plot, as well as the $R^2$ value.}
+    \label{fig:fits_constant_E_model2}
+\end{figure}
+
+The values of $\tau$ for the Model 2 are shown in Figure \ref{fig:tau_constant_E_model2}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/tau_constant_E_model2.png}
+    \caption{Values of $\tau$ for the Model 2 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
+    \label{fig:tau_constant_E_model2}
+\end{figure}
+
+The values of $\tau_2$ for the Model 2 are shown in Figure \ref{fig:tau2_constant_E_model2}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/tau2_constant_E_model2.png}
+    \caption{Values of $\tau_2$ for the Model 2 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
+    \label{fig:tau2_constant_E_model2}
+\end{figure}
+
+\section{Model 3}
+
+\subsection{Constant Intensity}
+
+In this case, only scans with a constant intensity of 2 $\upmu$J are considered. Each individual signal was fitted with the Model 3 and the results are shown in Figure \ref{fig:fits_constant_I_model3}, together with the corresponding residuals (in green).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/fits_constant_I_model3.png}
+    \caption{Fitted signals for the Model 3 with constant intensity of 2 $\upmu$J. The fitted curve is shown in red, the experimental data is shown in blue, and the residuals are shown in green. Values for the $\chi^2$/dof goodness of fit are shown in the title of each plot, as well as the $R^2$ value.}
+    \label{fig:fits_constant_I_model3}
+\end{figure}
+
+The values of $\tau$ for the Model 3 are shown in Figure \ref{fig:tau_constant_I_model3}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/tau_constant_I_model3.png}
+    \caption{Values of $\tau$ for the Model 3 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
+    \label{fig:tau_constant_I_model3}
+\end{figure}
+
+The values of $\tau_2$ for the Model 3 are shown in Figure \ref{fig:tau2_constant_I_model3}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/tau2_constant_I_model3.png}
+    \caption{Values of $\tau_2$ for the Model 3 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
+    \label{fig:tau2_constant_I_model3}
+\end{figure}
+
+\subsection{Constant Energy}
+
+In this case, only scans with a constant energy of 63.6 eV are considered. Each individual signal was fitted with the Model 3 and the results are shown in Figure \ref{fig:fits_constant_E_model3}, together with the corresponding residuals (in green).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/fits_constant_E_model3.png}
+    \caption{Fitted signals for the Model 3 with constant energy of 63.6 eV. The fitted curve is shown in red, the experimental data is shown in blue, and the residuals are shown in green. Values for the $\chi^2$/dof goodness of fit are shown in the title of each plot, as well as the $R^2$ value.}
+    \label{fig:fits_constant_E_model3}
+\end{figure}
+
+The values of $\tau$ for the Model 3 are shown in Figure \ref{fig:tau_constant_E_model3}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/tau_constant_E_model3.png}
+    \caption{Values of $\tau$ for the Model 3 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
+    \label{fig:tau_constant_E_model3}
+\end{figure}
+
+The values of $\tau_2$ for the Model 3 are shown in Figure \ref{fig:tau2_constant_E_model3}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/tau2_constant_E_model3.png}
+    \caption{Values of $\tau_2$ for the Model 3 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
+    \label{fig:tau2_constant_E_model3}
+\end{figure}
+
+\section{Comparison of Models}
+
+\subsection{Constant Intensity}
+
+The value of $\tau$ for the Model 1, Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J are shown in Figure \ref{fig:tau_constant_I_all_models}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/tau_constant_I_all_models.png}
+    \caption{Values of $\tau$ for the Model 1, Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan.}
+    \label{fig:tau_constant_I_all_models}
+\end{figure}
+
+The value of $\tau_2$ for the Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J are shown in Figure \ref{fig:tau2_constant_I_all_models}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/tau2_constant_I_all_models.png}
+    \caption{Values of $\tau_2$ for the Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. Errorbars were not included in the plot for clarity, since they are too big.}
+    \label{fig:tau2_constant_I_all_models}
+\end{figure}
+
+\subsection{Constant Energy}
+
+The value of $\tau$ for the Model 1, Model 2 and Model 3 considering a constant energy of 63.6 eV are shown in Figure \ref{fig:tau_constant_E_all_models}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/tau_constant_E_all_models.png}
+    \caption{Values of $\tau$ for the Model 1, Model 2 and Model 3 considering a constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
+    \label{fig:tau_constant_E_all_models}
+\end{figure}
+
+The value of $\tau_2$ for the Model 2 and Model 3 considering a constant energy of 63.6 eV are shown in Figure \ref{fig:tau2_constant_E_all_models}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/tau2_constant_E_all_models.png}
+    \caption{Values of $\tau_2$ for the Model 2 and Model 3 considering a constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan. Errorbars were not included in the plot for clarity, since they are too big.}
+    \label{fig:tau2_constant_E_all_models}
+\end{figure}
+
+\section{Observations}
+
+\subsection{Constant Intensity Results}
+
+It is observed that all models can fit the data well. However, Model 1 leads to a $\chi^2$/dof goodness of fit closer to 1 than Model 2 and Model 3. However, Model 2 and Model 3 can fit the data better than Model 1 since the value of $R^2$ is closer to 1 for Model 2 and Model 3. Also, by observing the residuals, it is observed that Model 2 and Model 3 are able to fit the data better than Model 1, since the residuals are smaller for Model 2 and Model 3.
+
+\subsection{Constant Energy Results}
+
+Similar to the constant intensity results, all models can fit the data well. However, Model 1 leads to a $\chi^2$/dof goodness of fit closer to 1 than Model 2 and Model 3. However, Model 2 and Model 3 (except for intensity values of 3.7 $\upmu$J and 3.9 $\upmu$J) can fit the data better than Model 1 since the value of $R^2$ is closer to 1 for Model 2 and Model 3. Also, by observing the residuals, it is observed that Model 2 and Model 3 are able to fit the data better than Model 1, since the residuals are smaller for Model 2 and Model 3.
+
+Nevertheless, Models 2 and 3 lead to $\tau$ vs intensity plots that do not show a clear trend, while Model 1 does.
+
+\subsection{Comparison of Models Results}
+
+At a constant intensity of 2 $\upmu$J, Models 1 to 3 show $\tau$ vs energy plots that show a similar trend. However, the values of $\tau$ for Models 2 and 3 are consistently lower than the values of $\tau$ for Model 1. Also, for Models 2 and 3, error bars are noticeably bigger than the ones obtained for Model 1.
+
+At a constant energy of 63.6 eV, only Model 1 shows a clear trend in the $\tau$ vs intensity plot while keeping error bars small. Models 2 and 3 lead to $\tau$ vs intensity plots that do not show a clear trend and keep error bars big.
+
+%\bibliographystyle{unsrtnat}
+%\bibliography{references}
 
 \end{document}
