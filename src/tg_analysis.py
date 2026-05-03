@@ -597,25 +597,34 @@ class TGAnalysis:
             plt.show()
 
     def plot_params_all_models(self, models_config, param_name, mode, errors_bool=False, y_limits=None, save_path=None):
-        """Compare fitted decay times for multiple model configurations.
+        """Compare one fitted parameter across multiple model configurations.
 
         Parameters
         ----------
         models_config : list[dict]
-            List of fitting configurations passed to ``get_fit_parameters``.
+            Each dict must include keys ``model_idxs``, ``initial_guess_bool``,
+            ``bounds``, ``label_model``, and ``color``, passed to
+            :meth:`get_fit_parameters` in order.
+        param_name : str
+            Name of the parameter in ``params_fit`` (e.g. ``"tau"``, ``"sigma"``).
+        mode : {"constant_E", "constant_I"}
+            Same scan-selection mode used with :meth:`get_data_scan`: constant
+            energy (abscissa = intensity) or constant intensity (abscissa = energy).
         errors_bool : bool, optional
-            If ``True``, include error bars for fitted ``tau`` values.
-        mode : str
-            "energy" or "intensity"
+            If ``True``, include error bars for the selected parameter.
+        y_limits : tuple[float, float] or None, optional
+            Optional y-axis limits.
+        save_path : str or None, optional
+            If set, save the figure to this path.
         """
         if mode == "constant_E":
             x_data = self.intensities
             x_label = r"Intensity ($\mu$J)"
-            title = f"{self.params_fit[0][param_name][-1]} vs Energy"
+            title = f"{self.params_fit[0][param_name][-1]} vs Intensity"
         elif mode == "constant_I":
             x_data = self.energies
             x_label = "Energy (eV)"
-            title = f"{self.params_fit[0][param_name][-1]} vs Intensity"
+            title = f"{self.params_fit[0][param_name][-1]} vs Energy"
         else:
             raise ValueError("Invalid mode")
         plt.figure(figsize=(8, 5))

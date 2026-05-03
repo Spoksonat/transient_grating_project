@@ -12,8 +12,12 @@
 \usepackage{hyperref}
 \usepackage{upgreek}
 \usepackage[numbers,sort&compress]{natbib}
+\usepackage{pgffor}
 
 \geometry{top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
+
+% Basename for parameter-vs-scan plots: e.g. tau -> tau_constant_I_model1
+\newcommand{\paramplotConstantIModelOne}[1]{#1_constant_I_model1}
 
 \definecolor{titleblack}{RGB}{0,0,0}
 \definecolor{titlewhite}{RGB}{255,255,255}
@@ -132,7 +136,7 @@ The available scans for the dataset CoOx12 are represented by each point in the 
 
 \subsection{Constant Intensity}
 
-In this case, only scans with a constant intensity of 2 $\upmu$J are considered. Each individual signal was fitted with the Model 1 and the results are shown in Figure \ref{fig:fits_constant_I_model1}, together with the corresponding residuals (in green).
+In this case, only scans with a constant intensity of 2 $\upmu$J are considered. Each individual signal was fitted with the Model 1 and the results are shown in Figure \ref{fig:fits_constant_I_model1}, together with the corresponding residuals (in green). All signals (experimental and fitted) are shown one on top of the other in Figure \ref{fig:stacked_signals_constant_I_model1}.
 
 \begin{figure}[H]
     \centering
@@ -141,40 +145,70 @@ In this case, only scans with a constant intensity of 2 $\upmu$J are considered.
     \label{fig:fits_constant_I_model1}
 \end{figure}
 
-The values of $\tau$ for the Model 1 are shown in Figure \ref{fig:tau_constant_I_model1}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/stacked_signals_constant_I_model1.png}
+    \caption{Stacked signals for the Model 1 with constant intensity of 2 $\upmu$J. The experimental data is shown in blue, and the fitted curve is shown in red. All signals are shown one on top of the other.}
+    \label{fig:stacked_signals_constant_I_model1}
+\end{figure}
+
+\foreach \param/\disp in {%
+    amp1/$A_1$,%
+    tau/$\tau$,%
+    sigma/$\sigma$,%
+    amp2/$A_2$,%
+    t0/$t_0$%
+}{%
+The values of \disp\ for the Model 1 are shown in Figure~\ref{fig:\param_constant_I_model1}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/tau_constant_I_model1.png}
-    \caption{Values of $\tau$ for the Model 1 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
-    \label{fig:tau_constant_I_model1}
+    \includegraphics[width=\textwidth]{figures/\param_constant_I_model1.png}
+    \caption{Values of \disp\ for the Model 1 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
+    \label{fig:\param_constant_I_model1}
 \end{figure}
+}
 
 \subsection{Constant Energy}
 
-In this case, only scans with a constant energy of 63.6 eV are considered. Each individual signal was fitted with the Model 1 and the results are shown in Figure \ref{fig:fits_constant_E_model1}, together with the corresponding residuals (in green).
+In this case, only scans with a constant energy of 63.6 eV are considered. Each individual signal was fitted with the Model 1 and the results are shown in Figure \ref{fig:fits_constant_E_model1}, together with the corresponding residuals (in green). All signals (experimental and fitted) are shown one on top of the other in Figure \ref{fig:stacked_signals_constant_E_model1}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/fits_constant_E_model1.png}
-    \caption{Fitted signals for the Model 1 with constant energy of 1000 eV. The fitted curve is shown in red, the experimental data is shown in blue, and the residuals are shown in green. Values for the $\chi^2$/dof goodness of fit are shown in the title of each plot, as well as the $R^2$ value.}
+    \caption{Fitted signals for the Model 1 with constant energy of 63.6 eV. The fitted curve is shown in red, the experimental data is shown in blue, and the residuals are shown in green. Values for the $\chi^2$/dof goodness of fit are shown in the title of each plot, as well as the $R^2$ value.}
     \label{fig:fits_constant_E_model1}
 \end{figure}
 
-The values of $\tau$ for the Model 1 are shown in Figure \ref{fig:tau_constant_E_model1}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/stacked_signals_constant_E_model1.png}
+    \caption{Stacked signals for the Model 1 with constant energy of 63.6 eV. The experimental data is shown in blue, and the fitted curve is shown in red. All signals are shown one on top of the other.}
+    \label{fig:stacked_signals_constant_E_model1}
+\end{figure}
+
+\foreach \param/\disp in {%
+    amp1/$A_1$,%
+    tau/$\tau$,%
+    sigma/$\sigma$,%
+    amp2/$A_2$,%
+    t0/$t_0$%
+}{%
+The values of \disp\ for the Model 1 are shown in Figure~\ref{fig:\param_constant_E_model1}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{figures/tau_constant_E_model1.png}
-    \caption{Values of $\tau$ for the Model 1 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
-    \label{fig:tau_constant_E_model1}
+    \includegraphics[width=\textwidth]{figures/\param_constant_E_model1.png}
+    \caption{Values of \disp\ for the Model 1 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
+    \label{fig:\param_constant_E_model1}
 \end{figure}
+}
 
 \section{Model 2}
 
 \subsection{Constant Intensity}
 
-In this case, only scans with a constant intensity of 2 $\upmu$J are considered. Each individual signal was fitted with the Model 2 and the results are shown in Figure \ref{fig:fits_constant_I_model2}, together with the corresponding residuals (in green).
+In this case, only scans with a constant intensity of 2 $\upmu$J are considered. Each individual signal was fitted with the Model 2 and the results are shown in Figure \ref{fig:fits_constant_I_model2}, together with the corresponding residuals (in green). All signals (experimental and fitted) are shown one on top of the other in Figure \ref{fig:stacked_signals_constant_I_model2}.
 
 \begin{figure}[H]
     \centering
@@ -183,27 +217,39 @@ In this case, only scans with a constant intensity of 2 $\upmu$J are considered.
     \label{fig:fits_constant_I_model2}
 \end{figure}
 
-The values of $\tau$ for the Model 2 are shown in Figure \ref{fig:tau_constant_I_model2}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/stacked_signals_constant_I_model2.png}
+    \caption{Stacked signals for the Model 2 with constant intensity of 2 $\upmu$J. The experimental data is shown in blue, and the fitted curve is shown in red. All signals are shown one on top of the other.}
+    \label{fig:stacked_signals_constant_I_model2}
+\end{figure}
+
+\foreach \param/\disp in {%
+    amp1/$A_1$,%
+    tau/$\tau$,%
+    sigma/$\sigma$,%
+    amp2/$A_2$,%
+    t0/$t_0$%
+    omega/$omega$,%
+    phi/$phi$,%
+    amp3/$A_3$,%
+    tau2/$tau_2$%
+}{%
+
+The values of \disp\ for the Model 2 are shown in Figure~\ref{fig:\param_constant_I_model2}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/tau_constant_I_model2.png}
-    \caption{Values of $\tau$ for the Model 2 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
-    \label{fig:tau_constant_I_model2}
+    \includegraphics[width=\textwidth]{figures/\param_constant_I_model2.png}
+    \caption{Values of \disp\ for the Model 2 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
+    \label{fig:\param_constant_I_model2}
 \end{figure}
 
-The values of $\tau_2$ for the Model 2 are shown in Figure \ref{fig:tau2_constant_I_model2}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{figures/tau2_constant_I_model2.png}
-    \caption{Values of $\tau_2$ for the Model 2 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
-    \label{fig:tau2_constant_I_model2}
-\end{figure}
+}
 
 \subsection{Constant Energy}
 
-In this case, only scans with a constant energy of 63.6 eV are considered. Each individual signal was fitted with the Model 2 and the results are shown in Figure \ref{fig:fits_constant_E_model2}, together with the corresponding residuals (in green).
+In this case, only scans with a constant energy of 63.6 eV are considered. Each individual signal was fitted with the Model 2 and the results are shown in Figure \ref{fig:fits_constant_E_model2}, together with the corresponding residuals (in green). All signals (experimental and fitted) are shown one on top of the other in Figure \ref{fig:stacked_signals_constant_E_model2}.
 
 \begin{figure}[H]
     \centering
@@ -212,29 +258,39 @@ In this case, only scans with a constant energy of 63.6 eV are considered. Each 
     \label{fig:fits_constant_E_model2}
 \end{figure}
 
-The values of $\tau$ for the Model 2 are shown in Figure \ref{fig:tau_constant_E_model2}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/stacked_signals_constant_E_model2.png}
+    \caption{Stacked signals for the Model 2 with constant energy of 63.6 eV. The experimental data is shown in blue, and the fitted curve is shown in red. All signals are shown one on top of the other.}
+    \label{fig:stacked_signals_constant_E_model2}
+\end{figure}
+
+\foreach \param/\disp in {%
+    amp1/$A_1$,%
+    tau/$\tau$,%
+    sigma/$\sigma$,%
+    amp2/$A_2$,%
+    t0/$t_0$%
+    omega/$omega$,%
+    phi/$phi$,%
+    amp3/$A_3$,%
+    tau2/$tau_2$%
+}{%
+The values of \disp\ for the Model 2 are shown in Figure~\ref{fig:\param_constant_E_model2}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{figures/tau_constant_E_model2.png}
-    \caption{Values of $\tau$ for the Model 2 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
-    \label{fig:tau_constant_E_model2}
+    \includegraphics[width=\textwidth]{figures/\param_constant_E_model2.png}
+    \caption{Values of \disp\ for the Model 2 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
+    \label{fig:\param_constant_E_model2}
 \end{figure}
-
-The values of $\tau_2$ for the Model 2 are shown in Figure \ref{fig:tau2_constant_E_model2}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{figures/tau2_constant_E_model2.png}
-    \caption{Values of $\tau_2$ for the Model 2 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
-    \label{fig:tau2_constant_E_model2}
-\end{figure}
+}
 
 \section{Model 3}
 
 \subsection{Constant Intensity}
 
-In this case, only scans with a constant intensity of 2 $\upmu$J are considered. Each individual signal was fitted with the Model 3 and the results are shown in Figure \ref{fig:fits_constant_I_model3}, together with the corresponding residuals (in green).
+In this case, only scans with a constant intensity of 2 $\upmu$J are considered. Each individual signal was fitted with the Model 3 and the results are shown in Figure \ref{fig:fits_constant_I_model3}, together with the corresponding residuals (in green). All signals (experimental and fitted) are shown one on top of the other in Figure \ref{fig:stacked_signals_constant_I_model3}.
 
 \begin{figure}[H]
     \centering
@@ -243,27 +299,40 @@ In this case, only scans with a constant intensity of 2 $\upmu$J are considered.
     \label{fig:fits_constant_I_model3}
 \end{figure}
 
-The values of $\tau$ for the Model 3 are shown in Figure \ref{fig:tau_constant_I_model3}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{figures/stacked_signals_constant_I_model3.png}
+    \caption{Stacked signals for the Model 3 with constant intensity of 2 $\upmu$J. The experimental data is shown in blue, and the fitted curve is shown in red. All signals are shown one on top of the other.}
+    \label{fig:stacked_signals_constant_I_model3}
+\end{figure}
+
+\foreach \param/\disp in {%
+    amp1/$A_1$,%
+    amp2/$A_2$,%
+    amp3/$A_3$,%
+    amp4/$A_4$,%
+    t0/$t_0$%
+    tau/$tau$,%
+    tau2/$tau_2$,%
+    tau10/$tau_10$,%
+    tau20/$tau_20$,%
+    sigma/$\sigma$,%
+    omega/$omega$,%
+    phi/$phi$%
+}{%
+The values of \disp\ for the Model 3 are shown in Figure~\ref{fig:\param_constant_I_model3}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/tau_constant_I_model3.png}
-    \caption{Values of $\tau$ for the Model 3 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
-    \label{fig:tau_constant_I_model3}
+    \includegraphics[width=\textwidth]{figures/\param_constant_I_model3.png}
+    \caption{Values of \disp\ for the Model 3 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
+    \label{fig:\param_constant_I_model3}
 \end{figure}
-
-The values of $\tau_2$ for the Model 3 are shown in Figure \ref{fig:tau2_constant_I_model3}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{figures/tau2_constant_I_model3.png}
-    \caption{Values of $\tau_2$ for the Model 3 with constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. As a visual reference, values of absorbance for Co$^{+2}$, Co$^{+3}$ and Co$_3$O$_4$ are shown as area plots.}
-    \label{fig:tau2_constant_I_model3}
-\end{figure}
+}
 
 \subsection{Constant Energy}
 
-In this case, only scans with a constant energy of 63.6 eV are considered. Each individual signal was fitted with the Model 3 and the results are shown in Figure \ref{fig:fits_constant_E_model3}, together with the corresponding residuals (in green).
+In this case, only scans with a constant energy of 63.6 eV are considered. Each individual signal was fitted with the Model 3 and the results are shown in Figure \ref{fig:fits_constant_E_model3}, together with the corresponding residuals (in green). All signals (experimental and fitted) are shown one on top of the other in Figure \ref{fig:stacked_signals_constant_E_model3}.
 
 \begin{figure}[H]
     \centering
@@ -272,65 +341,110 @@ In this case, only scans with a constant energy of 63.6 eV are considered. Each 
     \label{fig:fits_constant_E_model3}
 \end{figure}
 
-The values of $\tau$ for the Model 3 are shown in Figure \ref{fig:tau_constant_E_model3}.
-
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{figures/tau_constant_E_model3.png}
-    \caption{Values of $\tau$ for the Model 3 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
-    \label{fig:tau_constant_E_model3}
+    \includegraphics[width=\textwidth]{figures/stacked_signals_constant_E_model3.png}
+    \caption{Stacked signals for the Model 3 with constant energy of 63.6 eV. The experimental data is shown in blue, and the fitted curve is shown in red. All signals are shown one on top of the other.}
+    \label{fig:stacked_signals_constant_E_model3}
 \end{figure}
 
-The values of $\tau_2$ for the Model 3 are shown in Figure \ref{fig:tau2_constant_E_model3}.
+\foreach \param/\disp in {%
+    amp1/$A_1$,%
+    amp2/$A_2$,%
+    amp3/$A_3$,%
+    amp4/$A_4$,%
+    t0/$t_0$%
+    tau/$tau$,%
+    tau2/$tau_2$,%
+    tau10/$tau_10$,%
+    tau20/$tau_20$,%
+    sigma/$\sigma$,%
+    omega/$omega$,%
+    phi/$phi$%
+}{%
+The values of \disp\ for the Model 3 are shown in Figure~\ref{fig:\param_constant_E_model3}.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{figures/tau2_constant_E_model3.png}
-    \caption{Values of $\tau_2$ for the Model 3 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
-    \label{fig:tau2_constant_E_model3}
+    \centering  
+    \includegraphics[width=\textwidth]{figures/\param_constant_E_model3.png}
+    \caption{Values of \disp\ for the Model 3 with constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
+    \label{fig:\param_constant_E_model3}
 \end{figure}
+}
 
 \section{Comparison of Models}
 
 \subsection{Constant Intensity}
 
-The value of $\tau$ for the Model 1, Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J are shown in Figure \ref{fig:tau_constant_I_all_models}.
+\foreach \param/\disp in {%
+    amp1/$A_1$,%
+    tau/$\tau$,%
+    sigma/$\sigma$,%
+    amp2/$A_2$,%
+    t0/$t_0$%
+}{%
+The value of \disp\ for the Model 1, Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J are shown in Figure~\ref{fig:\param_constant_I_all_models}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/tau_constant_I_all_models.png}
-    \caption{Values of $\tau$ for the Model 1, Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan.}
-    \label{fig:tau_constant_I_all_models}
+    \includegraphics[width=\textwidth]{figures/\param_constant_I_all_models.png}
+    \caption{Values of \disp\ for the Model 1, Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan.}
+    \label{fig:\param_constant_I_all_models}
 \end{figure}
+}
 
-The value of $\tau_2$ for the Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J are shown in Figure \ref{fig:tau2_constant_I_all_models}.
+\foreach \paramm/\dispp in {%
+    omega/$omega$,%
+    phi/$phi$%
+    amp3/$A_3$,%
+    tau2/$tau_2$%
+}{%
+The value of \dispp\ for the Model 2 and Model 3 considering a constant energy of 63.6 eV are shown in Figure~\ref{fig:\paramm_constant_I_all_models}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/tau2_constant_I_all_models.png}
-    \caption{Values of $\tau_2$ for the Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan. Errorbars were not included in the plot for clarity, since they are too big.}
-    \label{fig:tau2_constant_I_all_models}
+    \includegraphics[width=\textwidth]{figures/\paramm_constant_I_all_models.png}
+    \caption{Values of \dispp\ for the Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J. The values are shown as a function of the energy of the scan.}
+    \label{fig:\paramm_constant_I_all_models}
 \end{figure}
+}
 
 \subsection{Constant Energy}
 
-The value of $\tau$ for the Model 1, Model 2 and Model 3 considering a constant energy of 63.6 eV are shown in Figure \ref{fig:tau_constant_E_all_models}.
+\foreach \param/\disp in {%
+    amp1/$A_1$,%
+    tau/$\tau$,%
+    sigma/$\sigma$,%
+    amp2/$A_2$,%
+    t0/$t_0$%
+}{%
+The value of \disp\ for the Model 1, Model 2 and Model 3 considering a constant energy of 63.6 eV are shown in Figure~\ref{fig:\param_constant_E_all_models}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/tau_constant_E_all_models.png}
-    \caption{Values of $\tau$ for the Model 1, Model 2 and Model 3 considering a constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
-    \label{fig:tau_constant_E_all_models}
+    \includegraphics[width=\textwidth]{figures/\param_constant_E_all_models.png}
+    \caption{Values of \disp\ for the Model 1, Model 2 and Model 3 considering a constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
+    \label{fig:\param_constant_E_all_models}
 \end{figure}
+}
 
-The value of $\tau_2$ for the Model 2 and Model 3 considering a constant energy of 63.6 eV are shown in Figure \ref{fig:tau2_constant_E_all_models}.
+\foreach \paramm/\dispp in {%
+    omega/$omega$,%
+    phi/$phi$%
+    amp3/$A_3$,%
+    tau2/$tau_2$%
+}{%
+The value of \dispp\ for the Model 2 and Model 3 considering a constant energy of 63.6 eV are shown in Figure~\ref{fig:\paramm_constant_E_all_models}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{figures/tau2_constant_E_all_models.png}
-    \caption{Values of $\tau_2$ for the Model 2 and Model 3 considering a constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan. Errorbars were not included in the plot for clarity, since they are too big.}
-    \label{fig:tau2_constant_E_all_models}
+    \includegraphics[width=\textwidth]{figures/\paramm_constant_E_all_models.png}
+    \caption{Values of \dispp\ for the Model 2 and Model 3 considering a constant energy of 63.6 eV. The values are shown as a function of the intensity of the scan.}
+    \label{fig:\paramm_constant_E_all_models}
 \end{figure}
+}
+
+
 
 \section{Observations}
 

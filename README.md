@@ -13,8 +13,10 @@ transient_grating_project/
 ├── README.md
 ├── pyproject.toml
 ├── requirements.txt
-├── docs/
-├── report/
+├── .github/workflows/
+│   └── docs.yml          # Sphinx → GitHub Pages on push to main
+├── docs/                  # Sphinx sources (see docs/README.md)
+├── report/                # LaTeX report (see report/README.md)
 ├── src/
 │   ├── README.md
 │   ├── tg_analysis.py
@@ -27,7 +29,7 @@ transient_grating_project/
     └── Co3O4_absorbance.txt
 ```
 
-`report/` contains the LaTeX report workspace for documenting scientific results derived from this project.
+`report/` holds the LaTeX companion article (`main.tex`, figures, bibliography). HTML API documentation is generated under `docs/` and built output is kept in `docs/_build/` (ignored by git).
 
 ## What changed in the current analysis workflow
 
@@ -85,14 +87,18 @@ else:
 
 ## Documentation
 
-Build docs locally with Sphinx:
+Build the Sphinx manual locally:
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -e ".[docs]"
 sphinx-build -b html docs docs/_build/html
 ```
 
-Open `docs/_build/html/index.html`.
+Open `docs/_build/html/index.html`. The build directory `docs/_build/` is **gitignored** by design; regenerate it whenever sources change. Pushes to `main` rebuild and deploy HTML via GitHub Actions (`.github/workflows/docs.yml`).
+
+More detail: `docs/README.md`.
 
 ## External files and Git tracking
 

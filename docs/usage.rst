@@ -89,7 +89,20 @@ Minimal workflow
        {"model_idxs": 2, "initial_guess_bool": True, "bounds": True, "label_model": "Model 2", "color": "red"},
        {"model_idxs": 3, "initial_guess_bool": True, "bounds": True, "label_model": "Model 3", "color": "green"},
    ]
-   analysis.plot_params_all_models(models_config, param_name=param_name, mode=mode, errors_bool=True)
+   analysis.plot_params_all_models(
+       models_config,
+       param_name=param_name,
+       mode=mode,
+       errors_bool=False,
+       save_path="../report/figures/example_all_models.png",
+   )
+
+``mode`` must match how scans were selected: ``"constant_I"`` (parameter vs energy) or ``"constant_E"`` (parameter vs intensity).
+
+Batch export (notebook)
+-------------------------
+
+``results_tg.ipynb`` includes a loop over modes, models, and parameter names so you can regenerate report figures (fits, stacked signals, per-parameter plots, and optional ``plot_params_all_models`` overlays). Parameter names depend on the model (for example Model 1: ``amp1``, ``t0``, ``tau``, ``sigma``, ``amp2``; Model 2 adds oscillatory parameters and ``tau2``; Model 3 adds further decay channels). Adjust paths and ``models_config`` filters if a parameter exists only for some models.
 
 What each block does in practice
 --------------------------------

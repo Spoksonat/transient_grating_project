@@ -1,13 +1,16 @@
 Installation and docs build
 ===========================
 
-1. Activate the project environment:
+1. Create and activate a virtual environment (recommended):
 
 .. code-block:: bash
 
-   source Env_TG/bin/activate
+   python3 -m venv .venv
+   source .venv/bin/activate
 
-2. Install the project and documentation dependencies:
+   If you already use a named environment (for example ``Env_TG``), activate that instead.
+
+2. Install the project in editable mode with documentation extras:
 
 .. code-block:: bash
 
@@ -19,8 +22,12 @@ Installation and docs build
 
    sphinx-build -b html docs docs/_build/html
 
-4. Open the generated documentation at:
+   For a clean rebuild from scratch:
 
-.. code-block:: text
+.. code-block:: bash
 
-   docs/_build/html/index.html
+   sphinx-build -E -a -b html docs docs/_build/html
+
+4. Open ``docs/_build/html/index.html`` in a browser.
+
+The ``docs/_build/`` directory is excluded from version control; CI rebuilds the site on pushes to ``main`` (see ``.github/workflows/docs.yml``).

@@ -91,6 +91,17 @@ oscillatory rates, and a Gaussian-convolved step term:
 
    \Psi(t)=\sin(\omega t-\phi)-\cos(\omega t-\phi).
 
+Bounds and reported :math:`\tau`
+---------------------------------
+
+Fitted decay rates :math:`k` (in ps :math:`^{-1}`) are converted to
+:math:`\tau = 1000/k` fs when filling the ``"tau"`` entry in ``params_fit``.
+Models 2 and 3 impose lower bounds on the primary rate parameter (see
+``lower_bounds`` in ``get_fit_parameters``); if the optimizer sits on that
+bound across scans, reported :math:`\tau` can become nearly constant when
+comparing plots across models. Model 1 uses a weaker lower bound on :math:`k`,
+so its :math:`\tau` curve often varies more with scan conditions.
+
 Practical note
 --------------
 
