@@ -235,6 +235,7 @@ class TGAnalysis:
         self.errors_tau_fit = np.array([])
         self.chi2_fit = np.array([])
         self.r2_fit = np.array([])
+        self.popts = []
 
 
         for i in range(len(self.time_scans)):
@@ -248,6 +249,8 @@ class TGAnalysis:
                     raise ValueError("Length of model_idxs must be equal to the number of time scans")
                 else:
                     model_idx = model_idxs[i]
+
+            self.model_index = model_idx
             
             if model_idx == 1:
                 # Params: amp1, t0, k_tau, sigma, amp2
@@ -356,6 +359,7 @@ class TGAnalysis:
             self.taus_fit = np.append(self.taus_fit, params["tau"][0])
             self.errors_tau_fit = np.append(self.errors_tau_fit, params["tau"][1])
             self.params_fit.append(params)
+            self.popts.append(popt)
 
     def plot_phase_space(self, plot_names=False, errors_bool=False, save_path=None):
         """Plot the phase-space coverage of secure, non-repeated scans."""
@@ -387,12 +391,14 @@ class TGAnalysis:
         else:
             plt.show()
 
-    def plot_fits(self, save_path=None):
+    def plot_fits(self, save_path=None, components_bool=False):
         """Plot data vs fitted curves and relative error per scan."""
         if not hasattr(self, "times_fit") or not hasattr(self, "tgsignals_fit"):
             raise ValueError("Fit data not found. Run get_fit_parameters() first.")
         if not hasattr(self, "tgsignals_sampled_fit"):
             raise ValueError("Sampled fit not found. Run get_fit_parameters() first.")
+
+        colors_components = ["green", "purple", "orange", "black", "turquoise"]
 
         n_scans = len(self.scans)
         n_cols = int(np.ceil(np.sqrt(n_scans)))
@@ -421,7 +427,71 @@ class TGAnalysis:
                 color="red",
                 linestyle="-",
                 linewidth=1.5,
+                label="Fit",
             )
+
+            if components_bool:
+                if self.model_index == 1:
+                    def model(t, amp1, t0, k_tau, sigma, amp2):
+                        """Model 1: mono-exponential decay convolved with Gaussian response."""
+                        exp1 = np.exp(-(t - t0)*k_tau)
+                        exp2 = np.exp(0.5*(k_tau*sigma)**2)
+                        erf1 = special.erf((t - t0 - k_tau*sigma**2)/(np.sqrt(2)*sigma))
+                        erf2 = special.erf((t-t0)/(np.sqrt(2)*sigma))
+                        comp1 = amp1*exp1*exp2*(1 + erf1)
+                        comp2 = amp2*(1 + erf2)
+                        function = comp1 + comp2
+                        return [[comp1, "Exponential"], [comp2, "Offset"]]
+
+                elif self.model_index == 2:
+                    def model(t, amp1, t0, k1, sigma, amp2, omega, phi, amp3, k2):
+                        """Model 2: bi-exponential decay: one decay plus one damped oscillatory contribution."""
+                        exp1 = np.exp(-(t - t0)*k1)
+                        exp2 = np.exp(0.5*(k1*sigma)**2)
+                        exp3 = np.exp(-k2*(t - t0))
+                        exp4 = np.exp(-0.5*(k2*sigma)**2)
+                        erf1 = special.erf((t - t0 - k1*sigma**2)/(np.sqrt(2)*sigma))
+                        erf2 = special.erf((t-t0)/(np.sqrt(2)*sigma))
+                        erf3 = special.erf((t-t0-k2*sigma**2)/(np.sqrt(2)*sigma))
+                        osc_factor = np.sin(omega*t - phi) - np.cos(omega*t - phi)
+                        comp1 = amp1*exp1*exp2*(1 + erf1)
+                        comp2 = amp2*(1 + erf2)
+                        comp3 = amp3*exp3*exp4*(1 + erf3)*osc_factor
+                        function = comp1 + comp2 + comp3
+                        return [[comp1, "Exponential"], [comp2, "Offset"], [comp3, "Exp. Osc."]]
+
+                elif self.model_index == 3:
+                    def model(t, amp1, amp2, amp3, amp4, t0, k1, k2, k10, k20, sigma, omega, phi):
+                        """Model 3: multi-exponential decay: two decay plus one damped oscillatory contribution."""
+                        exp1 = np.exp(-(t - t0)*k1)
+                        exp2 = np.exp(-(t - t0)*k2)
+                        exp3 = np.exp(-(t - t0)*k10)
+                        exp4 = np.exp(-(t - t0)*k20)
+                        exp5 = np.exp(-0.5*(k1*sigma)**2)
+                        exp6 = np.exp(-0.5*(k2*sigma)**2)
+                        exp7 = np.exp(-0.5*(k10*sigma)**2)
+                        exp8 = np.exp(-0.5*(k20*sigma)**2)
+                        erf1 = special.erf((t - t0 - k1*sigma**2)/(np.sqrt(2)*sigma))
+                        erf2 = special.erf((t - t0 - k2*sigma**2)/(np.sqrt(2)*sigma))
+                        erf3 = special.erf((t-t0-k10*sigma**2)/(np.sqrt(2)*sigma))
+                        erf4 = special.erf((t-t0-k20*sigma**2)/(np.sqrt(2)*sigma))
+                        erf5 = special.erf((t-t0)/(np.sqrt(2)*sigma))
+                        osc_factor = np.sin(omega*t - phi) - np.cos(omega*t - phi)
+                        comp1 = amp1*exp1*exp5*(1 + erf1)
+                        comp2 = amp2*exp2*exp6*(1 + erf2)
+                        comp3 = amp3*exp3*exp7*osc_factor*(1 + erf3)
+                        comp4 = amp3*exp4*exp8*(1 + erf4)*osc_factor
+                        comp5 = amp4*(1 + erf5)
+                        function = comp1 + comp2 - comp3 + comp4 + comp5
+                        return [[comp1, "Exponential 1"], [comp2, "Exponential 2"], [-comp3, "Exp. Osc. 1"], [comp4, "Exp. Osc. 2"], [comp5, "Offset"]]
+
+                else:
+                    raise ValueError("Model not found. Run get_fit_parameters() first.")
+                
+                for j, comp in enumerate(model(self.times_fit[i], *self.popts[i])):
+                    ax_main.plot(self.times_fit[i], comp[0], linestyle="--", linewidth=1.5, color=colors_components[j], label=comp[1])
+
+
             ax_main.set_title(self.scans[i] + " - E: " + f"{self.energies[i]:.1f} eV, I: {self.intensities[i]:.1f} $\\mu$J" + "\n" + rf"$\chi^2$/dof = {self.chi2_fit[i]:.4f}, $R^2$ = {self.r2_fit[i]:.4f}")
             ax_main.set_ylabel("TG Signal")
             ax_main.grid(linestyle="--", alpha=0.5)
@@ -434,6 +504,9 @@ class TGAnalysis:
             ax_res.set_ylabel(r"Rel.\ Diff.\ (a.u.)", fontsize=8)
             ax_res.tick_params(axis="both", labelsize=8)
             ax_res.grid(linestyle="--", alpha=0.5)
+
+        handles, labels = ax_main.get_legend_handles_labels()
+        fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.05), ncol=3, fontsize=7)
 
         fig.tight_layout()
         if save_path is not None:
