@@ -76,11 +76,12 @@ The first model is described by the following equation:
 \begin{align}
     \begin{split}
         f(t)
-        &= \qty[A_1 e^{-(t-t_0)/\tau} + A_2]
+        &= \qty[A_1 e^{-(t-t_0)/\tau} + A_{offset}]
         \circledast \frac{1}{\sqrt{2\pi}\sigma} e^{-(t-t_0)^2/(2\sigma^2)} \\
         &= A_1 e^{-(t-t_0)/\tau} e^{\sigma^2/(2\tau^2)}
         \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau}{\sqrt{2}\sigma}\right)\right) \\
-        &\quad + A_2 \left(1 + \erf\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right)
+        &\quad + A_{offset} \left(1 + \erf\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right) \\
+        &= f_{1,1}(t) + f_{1,2}(t).
     \end{split}
 \end{align}
 
@@ -89,14 +90,14 @@ The second model is described by the following equation:
 \begin{align}
     \begin{split}
     f(t)
-    &= \qty[A_1 e^{-(t-t_0)/\tau} + A_2 + A_3 e^{-(t-t_0)/\tau_2}\sin(\omega t-\phi)]
+    &= \qty[A_1 e^{-(t-t_0)/\tau} + A_2 e^{-(t-t_0)/\tau_2} + A_{offset}]
     \circledast \frac{1}{\sqrt{2\pi}\sigma} e^{-(t-t_0)^2/(2\sigma^2)} \\
     &= A_1 e^{-(t-t_0)/\tau} e^{\sigma^2/(2\tau^2)}
     \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau}{\sqrt{2}\sigma}\right)\right) \\
-    &\quad + A_2 \left(1 + \erf\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right) \\
-    &\quad + A_3 e^{-(t-t_0)/\tau_2} e^{\sigma^2/(2\tau_2^2)}
-    \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_2}{\sqrt{2}\sigma}\right)\right)
-    (\sin(\omega t-\phi)-\cos(\omega t-\phi)).
+    &\quad + A_2 e^{-(t-t_0)/\tau_2} e^{\sigma^2/(2\tau_2^2)}
+    \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_2}{\sqrt{2}\sigma}\right)\right) \\
+    &\quad + A_{offset} \left(1 + \erf\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right)\\
+    &= f_{2,1}(t) + f_{2,2}(t) + f_{2,3}(t).
     \end{split}
     \end{align}
 
@@ -104,20 +105,18 @@ The second model is described by the following equation:
 The third model is described by the following equation:
 \begin{align}
     \begin{split}
-        f(t) &= \qty[A_1 e^{-(t-t_0)/\tau_1} + A_2 e^{-(t-t_0)/\tau_2} + A_3 (e^{-(t-t_0)/\tau_{20}} - e^{-(t-t_0)/\tau_{10}}) + A_4]\sin(\omega t-\phi) \\
-        &\quad \circledast \frac{1}{\sqrt{2\pi}\sigma} e^{-(t-t_0)^2/(2\sigma^2)} \\
-        &= A_1 e^{-(t-t_0)/\tau_1} e^{\sigma^2/(2\tau_1^2)}
-        \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_1}{\sqrt{2}\sigma}\right)\right) \\
-        &\quad + A_2 e^{-(t-t_0)/\tau_2} e^{\sigma^2/(2\tau_2^2)}
-        \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_2}{\sqrt{2}\sigma}\right)\right) \\
-        &\quad + A_3 e^{-(t-t_0)/\tau_{20}} e^{\sigma^2/(2\tau_{20}^2)}
-        \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_{20}}{\sqrt{2}\sigma}\right)\right)[\sin(\omega t-\phi)-\cos(\omega t-\phi)] \\
-        &\quad - A_3 e^{-(t-t_0)/\tau_{10}} e^{\sigma^2/(2\tau_{10}^2)}
-        \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_{10}}{\sqrt{2}\sigma}\right)\right)[\sin(\omega t-\phi)-\cos(\omega t-\phi)] \\
-        &\quad + A_4 \left(1 + \erf\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right),
+    f(t)
+    &= \qty[A_1 e^{-(t-t_0)/\tau} + A_2 e^{-(t-t_0)/\tau_2} + A_3 e^{-(t-t_0)/\tau_3}]
+    \circledast \frac{1}{\sqrt{2\pi}\sigma} e^{-(t-t_0)^2/(2\sigma^2)} \\
+    &= A_1 e^{-(t-t_0)/\tau} e^{\sigma^2/(2\tau^2)}
+    \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau}{\sqrt{2}\sigma}\right)\right) \\
+    &\quad + A_2 e^{-(t-t_0)/\tau_2} e^{\sigma^2/(2\tau_2^2)}
+    \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_2}{\sqrt{2}\sigma}\right)\right) \\
+    &\quad + A_3 e^{-(t-t_0)/\tau_3} e^{\sigma^2/(2\tau_3^2)}
+    \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_3}{\sqrt{2}\sigma}\right)\right)\\
+    &= f_{3,1}(t) + f_{3,2}(t) + f_{3,3}(t).
     \end{split}
-\end{align}
-where $\frac{1}{\tau_{20}} = \frac{1}{\tau_2} + \frac{1}{t_{0}}$ and $\frac{1}{\tau_{10}} = \frac{1}{\tau_1} + \frac{1}{t_{0}}$.
+    \end{align}
 
 \chapter{Results}
 
@@ -148,7 +147,7 @@ In this case, only scans with a constant intensity of 2 $\upmu$J are considered.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/fits_constant_I_model1_components.png}
-    \caption{Single fit components for the Model 1 with constant intensity of 2 $\upmu$J. The components are shown in green, orange, purple and black. The fit is shown in red.}
+    \caption{Single fit components for the Model 1 with constant intensity of 2 $\upmu$J. The components are shown in green ($f_{1,1}(t)$) and purple ($f_{1,2}(t)$) . The fit is shown in red.}
     \label{fig:fits_constant_I_model1_components}
 \end{figure}
 
@@ -163,8 +162,9 @@ In this case, only scans with a constant intensity of 2 $\upmu$J are considered.
     amp1/$A_1$,%
     tau/$\tau$,%
     sigma/$\sigma$,%
-    amp2/$A_2$,%
-    t0/$t_0$%
+    ampoff/$A_{offset}$,%
+    t0/$t_0$,%
+    r2/$R^2$%
 }{%
 The values of \disp\ for the Model 1 are shown in Figure~\ref{fig:\param_constant_I_model1}.
 
@@ -190,7 +190,7 @@ The single fit components are plotted in Figure \ref{fig:fits_constant_E_model1_
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/fits_constant_E_model1_components.png}
-    \caption{Single fit components for the Model 1 with constant energy of 63.6 eV. The components are shown in green, orange, purple and black. The fit is shown in red.}
+    \caption{Single fit components for the Model 1 with constant energy of 63.6 eV. The components are shown in green ($f_{1,1}(t)$) and purple ($f_{1,2}(t)$) . The fit is shown in red.}
     \label{fig:fits_constant_E_model1_components}
 \end{figure}
 
@@ -205,8 +205,9 @@ The single fit components are plotted in Figure \ref{fig:fits_constant_E_model1_
     amp1/$A_1$,%
     tau/$\tau$,%
     sigma/$\sigma$,%
-    amp2/$A_2$,%
-    t0/$t_0$%
+    ampoff/$A_{offset}$,%
+    t0/$t_0$,%
+    r2/$R^2$%
 }{%
 The values of \disp\ for the Model 1 are shown in Figure~\ref{fig:\param_constant_E_model1}.
 
@@ -233,7 +234,7 @@ In this case, only scans with a constant intensity of 2 $\upmu$J are considered.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/fits_constant_I_model2_components.png}
-    \caption{Single fit components for the Model 2 with constant intensity of 2 $\upmu$J. The components are shown in green, orange, purple and black. The fit is shown in red.}
+    \caption{Single fit components for the Model 2 with constant intensity of 2 $\upmu$J. The components are shown in green ($f_{2,1}(t)$), orange ($f_{2,2}(t)$), and purple ($f_{2,3}(t)$). The fit is shown in red.}
     \label{fig:fits_constant_I_model2_components}
 \end{figure}
 
@@ -248,12 +249,11 @@ In this case, only scans with a constant intensity of 2 $\upmu$J are considered.
     amp1/$A_1$,%
     tau/$\tau$,%
     sigma/$\sigma$,%
+    ampoff/$A_{offset}$,%
+    t0/$t_0$,%
     amp2/$A_2$,%
-    t0/$t_0$%
-    omega/$omega$,%
-    phi/$phi$,%
-    amp3/$A_3$,%
-    tau2/$tau_2$%
+    tau2/$\tau_2$,%
+    r2/$R^2$%
 }{%
 
 The values of \disp\ for the Model 2 are shown in Figure~\ref{fig:\param_constant_I_model2}.
@@ -281,7 +281,7 @@ In this case, only scans with a constant energy of 63.6 eV are considered. Each 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/fits_constant_E_model2_components.png}
-    \caption{Single fit components for the Model 2 with constant energy of 63.6 eV. The components are shown in green, orange, purple and black. The fit is shown in red.}
+    \caption{Single fit components for the Model 2 with constant energy of 63.6 eV. The components are shown in green ($f_{2,1}(t)$), orange ($f_{2,2}(t)$), and purple ($f_{2,3}(t)$). The fit is shown in red.}
     \label{fig:fits_constant_E_model2_components}
 \end{figure}
 
@@ -296,12 +296,11 @@ In this case, only scans with a constant energy of 63.6 eV are considered. Each 
     amp1/$A_1$,%
     tau/$\tau$,%
     sigma/$\sigma$,%
+    ampoff/$A_{offset}$,%
+    t0/$t_0$,%
     amp2/$A_2$,%
-    t0/$t_0$%
-    omega/$omega$,%
-    phi/$phi$,%
-    amp3/$A_3$,%
-    tau2/$tau_2$%
+    tau2/$\tau_2$,%
+    r2/$R^2$%
 }{%
 The values of \disp\ for the Model 2 are shown in Figure~\ref{fig:\param_constant_E_model2}.
 
@@ -329,7 +328,7 @@ In this case, only scans with a constant intensity of 2 $\upmu$J are considered.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{figures/fits_constant_I_model3_components.png}
-    \caption{Single fit components for the Model 3 with constant intensity of 2 $\upmu$J. The components are shown in green, orange, purple and black. The fit is shown in red.}
+    \caption{Single fit components for the Model 3 with constant intensity of 2 $\upmu$J. The components are shown in green ($f_{3,1}(t)$), orange ($f_{3,2}(t)$), and purple ($f_{3,3}(t)$). The fit is shown in red.}
     \label{fig:fits_constant_I_model3_components}
 \end{figure}
 
@@ -343,16 +342,11 @@ In this case, only scans with a constant intensity of 2 $\upmu$J are considered.
 \foreach \param/\disp in {%
     amp1/$A_1$,%
     amp2/$A_2$,%
-    amp3/$A_3$,%
-    amp4/$A_4$,%
-    t0/$t_0$%
-    tau/$tau$,%
-    tau2/$tau_2$,%
-    tau10/$tau_10$,%
-    tau20/$tau_20$,%
+    t0/$t_0$,%
+    tau/$\tau$,%
+    tau2/$\tau_2$,%
     sigma/$\sigma$,%
-    omega/$omega$,%
-    phi/$phi$%
+    r2/$R^2$%
 }{%
 The values of \disp\ for the Model 3 are shown in Figure~\ref{fig:\param_constant_I_model3}.
 
@@ -393,16 +387,11 @@ The single fit components are plotted in Figure \ref{fig:fits_constant_E_model3_
 \foreach \param/\disp in {%
     amp1/$A_1$,%
     amp2/$A_2$,%
-    amp3/$A_3$,%
-    amp4/$A_4$,%
-    t0/$t_0$%
-    tau/$tau$,%
-    tau2/$tau_2$,%
-    tau10/$tau_10$,%
-    tau20/$tau_20$,%
+    t0/$t_0$,%
+    tau/$\tau$,%
+    tau2/$\tau_2$,%
     sigma/$\sigma$,%
-    omega/$omega$,%
-    phi/$phi$%
+    r2/$R^2$%
 }{%
 The values of \disp\ for the Model 3 are shown in Figure~\ref{fig:\param_constant_E_model3}.
 
@@ -422,8 +411,8 @@ The values of \disp\ for the Model 3 are shown in Figure~\ref{fig:\param_constan
     amp1/$A_1$,%
     tau/$\tau$,%
     sigma/$\sigma$,%
-    amp2/$A_2$,%
-    t0/$t_0$%
+    t0/$t_0$,%
+    r2/$R^2$%
 }{%
 The value of \disp\ for the Model 1, Model 2 and Model 3 considering a constant intensity of 2 $\upmu$J are shown in Figure~\ref{fig:\param_constant_I_all_models}.
 
@@ -436,10 +425,8 @@ The value of \disp\ for the Model 1, Model 2 and Model 3 considering a constant 
 }
 
 \foreach \paramm/\dispp in {%
-    omega/$omega$,%
-    phi/$phi$%
-    amp3/$A_3$,%
-    tau2/$tau_2$%
+    amp2/$A_2$,%
+    tau2/$\tau_2$%
 }{%
 The value of \dispp\ for the Model 2 and Model 3 considering a constant energy of 63.6 eV are shown in Figure~\ref{fig:\paramm_constant_I_all_models}.
 
@@ -457,8 +444,8 @@ The value of \dispp\ for the Model 2 and Model 3 considering a constant energy o
     amp1/$A_1$,%
     tau/$\tau$,%
     sigma/$\sigma$,%
-    amp2/$A_2$,%
-    t0/$t_0$%
+    t0/$t_0$,%
+    r2/$R^2$%
 }{%
 The value of \disp\ for the Model 1, Model 2 and Model 3 considering a constant energy of 63.6 eV are shown in Figure~\ref{fig:\param_constant_E_all_models}.
 
@@ -471,10 +458,8 @@ The value of \disp\ for the Model 1, Model 2 and Model 3 considering a constant 
 }
 
 \foreach \paramm/\dispp in {%
-    omega/$omega$,%
-    phi/$phi$%
-    amp3/$A_3$,%
-    tau2/$tau_2$%
+    amp2/$A_2$,%
+    tau2/$\tau_2$%
 }{%
 The value of \dispp\ for the Model 2 and Model 3 considering a constant energy of 63.6 eV are shown in Figure~\ref{fig:\paramm_constant_E_all_models}.
 
@@ -485,26 +470,6 @@ The value of \dispp\ for the Model 2 and Model 3 considering a constant energy o
     \label{fig:\paramm_constant_E_all_models}
 \end{figure}
 }
-
-
-
-\section{Observations}
-
-\subsection{Constant Intensity Results}
-
-It is observed that all models can fit the data well. However, Model 1 leads to a $\chi^2$/dof goodness of fit closer to 1 than Model 2 and Model 3. However, Model 2 and Model 3 can fit the data better than Model 1 since the value of $R^2$ is closer to 1 for Model 2 and Model 3. Also, by observing the residuals, it is observed that Model 2 and Model 3 are able to fit the data better than Model 1, since the residuals are smaller for Model 2 and Model 3.
-
-\subsection{Constant Energy Results}
-
-Similar to the constant intensity results, all models can fit the data well. However, Model 1 leads to a $\chi^2$/dof goodness of fit closer to 1 than Model 2 and Model 3. However, Model 2 and Model 3 (except for intensity values of 3.7 $\upmu$J and 3.9 $\upmu$J) can fit the data better than Model 1 since the value of $R^2$ is closer to 1 for Model 2 and Model 3. Also, by observing the residuals, it is observed that Model 2 and Model 3 are able to fit the data better than Model 1, since the residuals are smaller for Model 2 and Model 3.
-
-Nevertheless, Models 2 and 3 lead to $\tau$ vs intensity plots that do not show a clear trend, while Model 1 does.
-
-\subsection{Comparison of Models Results}
-
-At a constant intensity of 2 $\upmu$J, Models 1 to 3 show $\tau$ vs energy plots that show a similar trend. However, the values of $\tau$ for Models 2 and 3 are consistently lower than the values of $\tau$ for Model 1. Also, for Models 2 and 3, error bars are noticeably bigger than the ones obtained for Model 1.
-
-At a constant energy of 63.6 eV, only Model 1 shows a clear trend in the $\tau$ vs intensity plot while keeping error bars small. Models 2 and 3 lead to $\tau$ vs intensity plots that do not show a clear trend and keep error bars big.
 
 %\bibliographystyle{unsrtnat}
 %\bibliography{references}

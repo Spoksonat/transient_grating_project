@@ -41,6 +41,7 @@ The current code/notebook workflow includes:
 - Generic parameter-vs-energy plotting via `plot_params_vs_energy(param_name=...)`.
 - Parameter-vs-intensity plotting via `plot_params_vs_intensity(param_name=...)`.
 - Multi-model comparison via `plot_params_all_models(..., mode=...)`.
+- Current exported fit parameters include `ampoff` (models 1/2, with NaN placeholder in model 3), `tau`, `tau2`, `tau3`, and `r2` for reporting.
 
 ## Data contract
 

@@ -10,15 +10,15 @@ Notation
 * :math:`t`: time (ps).
 * :math:`t_0`: time-zero shift.
 * :math:`\sigma`: Gaussian instrument-response width.
-* :math:`k, k_1, k_2`: decay rates in ps :math:`^{-1}`.
+* :math:`k, k_1, k_2, k_3`: decay rates in ps :math:`^{-1}`.
 * :math:`\tau = 1/k`: decay time (reported in fs in fit summaries).
 * :math:`\mathrm{erf}(\cdot)`: error function.
 
 Model 1 (``model1``)
 --------------------
 
-A mono-exponential decay (rate form) convolved with a Gaussian response plus
-a step-like term:
+A mono-exponential decay convolved with a Gaussian response plus
+an offset step term:
 
 .. math::
 
@@ -27,48 +27,42 @@ a step-like term:
    \exp\!\left(\frac{(k\sigma)^2}{2}\right)
    \left[1 + \mathrm{erf}\!\left(\frac{t-t_0-k\sigma^2}{\sqrt{2}\sigma}\right)\right]
    +
-   A_2 \left[1 + \mathrm{erf}\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right].
+   A_{\mathrm{off}} \left[1 + \mathrm{erf}\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right].
 
 Model 2 (``model2``)
 --------------------
 
-Model 1 plus a damped oscillatory contribution:
+Model 1 plus a second exponential decay channel:
 
 .. math::
 
-   f_2(t) = f_{\mathrm{exp}}(t) + f_{\mathrm{step}}(t) + f_{\mathrm{osc}}(t),
+   f_2(t) = f_{\mathrm{exp},1}(t) + f_{\mathrm{off}}(t) + f_{\mathrm{exp},2}(t),
 
 where:
 
 .. math::
 
-   f_{\mathrm{exp}}(t) =
+   f_{\mathrm{exp},1}(t) =
    A_1 \exp\!\left(-(t-t_0)k_1\right)
    \exp\!\left(\frac{(k_1\sigma)^2}{2}\right)
    \left[1 + \mathrm{erf}\!\left(\frac{t-t_0-k_1\sigma^2}{\sqrt{2}\sigma}\right)\right],
 
 .. math::
 
-   f_{\mathrm{step}}(t) =
-   A_2 \left[1 + \mathrm{erf}\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right],
+   f_{\mathrm{off}}(t) =
+   A_{\mathrm{off}} \left[1 + \mathrm{erf}\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right],
 
 .. math::
 
-   f_{\mathrm{osc}}(t) =
-   A_3 \exp\!\left[-k_2(t-t_0)\right]
+   f_{\mathrm{exp},2}(t) =
+   A_2 \exp\!\left[-k_2(t-t_0)\right]
    \exp\!\left(-\frac{(k_2\sigma)^2}{2}\right)
-   \left[1 + \mathrm{erf}\!\left(\frac{t-t_0-k_2\sigma^2}{\sqrt{2}\sigma}\right)\right]
-   \left[\sin(\omega t-\phi)-\cos(\omega t-\phi)\right].
+   \left[1 + \mathrm{erf}\!\left(\frac{t-t_0-k_2\sigma^2}{\sqrt{2}\sigma}\right)\right].
 
 Model 3 (``model3``)
 --------------------
 
-Extended multi-component form with two decay rates, two additional damped
-oscillatory rates, and a Gaussian-convolved step term:
-
-.. math::
-
-   \text{with independent rates } k_1,\;k_2,\;k_{10},\;k_{20}
+A sum of three Gaussian-convolved exponential channels:
 
 .. math::
 
@@ -78,29 +72,18 @@ oscillatory rates, and a Gaussian-convolved step term:
    +
    A_2 e^{-(t-t_0)k_2} e^{-\frac{(k_2\sigma)^2}{2}}
    \left[1+\mathrm{erf}\!\left(\frac{t-t_0-k_2\sigma^2}{\sqrt{2}\sigma}\right)\right]
-   -
-   A_3 e^{-(t-t_0)k_{10}} e^{-\frac{(k_{10}\sigma)^2}{2}}
-   \left[1+\mathrm{erf}\!\left(\frac{t-t_0-k_{10}\sigma^2}{\sqrt{2}\sigma}\right)\right]\Psi(t)
    +
-   A_3 e^{-(t-t_0)k_{20}} e^{-\frac{(k_{20}\sigma)^2}{2}}
-   \left[1+\mathrm{erf}\!\left(\frac{t-t_0-k_{20}\sigma^2}{\sqrt{2}\sigma}\right)\right]\Psi(t)
-   +
-   A_4\left[1+\mathrm{erf}\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right],
-
-.. math::
-
-   \Psi(t)=\sin(\omega t-\phi)-\cos(\omega t-\phi).
+   A_3 e^{-(t-t_0)k_3} e^{-\frac{(k_3\sigma)^2}{2}}
+   \left[1+\mathrm{erf}\!\left(\frac{t-t_0-k_3\sigma^2}{\sqrt{2}\sigma}\right)\right].
 
 Bounds and reported :math:`\tau`
 ---------------------------------
 
 Fitted decay rates :math:`k` (in ps :math:`^{-1}`) are converted to
-:math:`\tau = 1000/k` fs when filling the ``"tau"`` entry in ``params_fit``.
-Models 2 and 3 impose lower bounds on the primary rate parameter (see
-``lower_bounds`` in ``get_fit_parameters``); if the optimizer sits on that
-bound across scans, reported :math:`\tau` can become nearly constant when
-comparing plots across models. Model 1 uses a weaker lower bound on :math:`k`,
-so its :math:`\tau` curve often varies more with scan conditions.
+:math:`\tau = 1000/k` fs when filling ``"tau"``, ``"tau2"``, and ``"tau3"``
+entries in ``params_fit``. Model 1 and Model 2 also expose ``"ampoff"``
+for the convolved offset term; for plotting compatibility across models,
+Model 3 stores ``"ampoff"`` as ``NaN``.
 
 Practical note
 --------------

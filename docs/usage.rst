@@ -102,7 +102,7 @@ Minimal workflow
 Batch export (notebook)
 -------------------------
 
-``results_tg.ipynb`` includes a loop over modes, models, and parameter names so you can regenerate report figures (fits, stacked signals, per-parameter plots, and optional ``plot_params_all_models`` overlays). Parameter names depend on the model (for example Model 1: ``amp1``, ``t0``, ``tau``, ``sigma``, ``amp2``; Model 2 adds oscillatory parameters and ``tau2``; Model 3 adds further decay channels). Adjust paths and ``models_config`` filters if a parameter exists only for some models.
+``results_tg.ipynb`` includes a loop over modes, models, and parameter names so you can regenerate report figures (fits, stacked signals, per-parameter plots, and optional ``plot_params_all_models`` overlays). Parameter names depend on the model (for example Model 1: ``amp1``, ``t0``, ``tau``, ``sigma``, ``ampoff``, ``r2``; Model 2: ``amp1``, ``t0``, ``tau``, ``sigma``, ``ampoff``, ``amp2``, ``tau2``, ``r2``; Model 3: ``amp1``, ``amp2``, ``amp3``, ``t0``, ``tau``, ``tau2``, ``tau3``, ``sigma``, ``r2``). Adjust paths and ``models_config`` filters if a parameter exists only for some models.
 
 What each block does in practice
 --------------------------------
