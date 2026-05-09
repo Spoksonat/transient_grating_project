@@ -5,7 +5,7 @@
     "Energy_eV": 63.6,
     "XUV_intensity_uJ": 7.7,
     "flag_secure": true,
-    "repeated": false,  
+    "repeated": true,  
     "filter": false
   },
   "Scan039": {

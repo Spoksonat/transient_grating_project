@@ -29,7 +29,7 @@ This folder contains the analysis implementation and interactive notebooks.
 3. Inspect phase space (`plot_phase_space`, optionally with error bars).
 4. Select scans (`get_data_scan`) according to the chosen mode.
 5. Fit one model or per-scan models (`get_fit_parameters`).
-6. Visualize fits (`plot_fits`).
+6. Visualize fits (`plot_fits`), optionally with `plot_fits(..., components_bool=True)` for multi-term breakdowns.
 7. Plot any fitted parameter vs energy (`plot_params_vs_energy`) or vs intensity (`plot_params_vs_intensity`), depending on mode.
 8. Compare models (`plot_params_all_models`) with `mode` equal to `constant_E` or `constant_I` (same convention as `get_data_scan`).
 9. Optional: run the batch section at the end of the notebook to regenerate the full set of figures for `report/` (multiple models, parameter lists per model, comparison overlays).

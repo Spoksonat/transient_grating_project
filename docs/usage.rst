@@ -63,6 +63,8 @@ Minimal workflow
 .. code-block:: python
 
    analysis.plot_fits()
+   # Optional: decomposition into analytic components
+   # analysis.plot_fits(components_bool=True, save_path="../report/figures/fits_components.png")
    if mode == "constant_E":
        analysis.plot_params_vs_intensity(param_name=param_name, errors_bool=False)
    else:
@@ -110,7 +112,7 @@ What each block does in practice
 * ``TGAnalysis(json_path)`` loads metadata and builds ``df_scans`` with all ``ScanXXX`` entries.
 * ``get_data_scan(...)`` reads ``.mat`` files from ``main_path``, applies optional time filtering, subtracts baseline, and normalizes each TG trace by its integral.
 * ``get_fit_parameters(...)`` runs ``curve_fit`` scan by scan and stores values + uncertainties in ``params_fit`` for each parameter.
-* ``plot_fits()`` compares measured data vs fitted curves and reports :math:`\chi^2/\mathrm{dof}` and :math:`R^2`.
+* ``plot_fits()`` compares measured data vs fitted curves and reports :math:`\chi^2/\mathrm{dof}` and :math:`R^2`; use ``components_bool=True`` for dashed component curves when diagnosing multi-term models.
 * ``plot_params_vs_energy(...)`` overlays absorbance references and any selected fitted parameter when using constant-intensity mode.
 * ``plot_params_vs_intensity(...)`` plots fitted parameters against intensity when using constant-energy mode.
 * ``plot_params_all_models(...)`` compares one fitted parameter across multiple model configurations with explicit scan mode.

@@ -182,29 +182,37 @@ class TGAnalysis:
         function = amp1*exp1*exp2*(1 + erf1) + amp_offset*(1 + erf2)
         return function
 
-    def model2(self, t, amp1, t0, k1, sigma, amp_offset, amp2, k2):
-        """Model 2: two Gaussian-convolved exponential channels plus an offset."""
+    def model2(self, t, amp1, t0, k1, sigma, amp_offset, amp2, k2, t02):
+        """Model 2: two Gaussian-convolved exponential channels plus an offset.
+
+        The second decay uses an independent time origin ``t02`` (ps) for the
+        exponential and error-function terms, while the offset still uses ``t0``.
+        """
         exp1 = np.exp(-(t - t0)*k1)
         exp2 = np.exp(0.5*(k1*sigma)**2)
-        exp3 = np.exp(-k2*(t - t0))
+        exp3 = np.exp(-k2*(t - t02))
         exp4 = np.exp(-0.5*(k2*sigma)**2)
         erf1 = special.erf((t - t0 - k1*sigma**2)/(np.sqrt(2)*sigma))
         erf2 = special.erf((t-t0)/(np.sqrt(2)*sigma))
-        erf3 = special.erf((t-t0-k2*sigma**2)/(np.sqrt(2)*sigma))
+        erf3 = special.erf((t-t02-k2*sigma**2)/(np.sqrt(2)*sigma))
         function = amp1*exp1*exp2*(1 + erf1) + amp_offset*(1 + erf2) + amp2*exp3*exp4*(1 + erf3)
         return function
 
-    def model3(self, t, amp1, amp2, amp3, t0, k1, k2, k3, sigma):
-        """Model 3: three Gaussian-convolved exponential channels."""
+    def model3(self, t, amp1, amp2, amp3, t0, k1, k2, k3, sigma, t02, t03):
+        """Model 3: three Gaussian-convolved exponential channels.
+
+        Each channel uses its own time zero in ps: ``t0`` for the first decay,
+        ``t02`` for the second, and ``t03`` for the third.
+        """
         exp1 = np.exp(-(t - t0)*k1)
-        exp2 = np.exp(-(t - t0)*k2)
-        exp3 = np.exp(-(t - t0)*k3)
+        exp2 = np.exp(-(t - t02)*k2)
+        exp3 = np.exp(-(t - t03)*k3)
         exp4 = np.exp(-0.5*(k1*sigma)**2)
         exp5 = np.exp(-0.5*(k2*sigma)**2)
         exp6 = np.exp(-0.5*(k3*sigma)**2)
         erf1 = special.erf((t - t0 - k1*sigma**2)/(np.sqrt(2)*sigma))
-        erf2 = special.erf((t - t0 - k2*sigma**2)/(np.sqrt(2)*sigma))
-        erf3 = special.erf((t - t0 - k3*sigma**2)/(np.sqrt(2)*sigma))
+        erf2 = special.erf((t - t02 - k2*sigma**2)/(np.sqrt(2)*sigma))
+        erf3 = special.erf((t - t03 - k3*sigma**2)/(np.sqrt(2)*sigma))
         function = amp1*exp1*exp4*(1 + erf1) + amp2*exp2*exp5*(1 + erf2) + amp3*exp3*exp6*(1 + erf3) 
         return function
 
@@ -219,6 +227,12 @@ class TGAnalysis:
             If ``True``, pass predefined initial guesses to ``curve_fit``.
         bounds : bool, optional
             If ``True``, use predefined lower/upper bounds in the optimization.
+
+        Notes
+        -----
+        Results are appended scan-wise to ``params_fit``. Optimizer vectors are
+        stored in ``popts``. Reported ``sigma`` values in ``params_fit`` are in
+        femtoseconds (internally fitted in ps and scaled by 1000).
         """
 
         self.params_fit = []
@@ -245,32 +259,38 @@ class TGAnalysis:
                     model_idx = model_idxs[i]
 
             self.model_index = model_idx
+
+            sigma_initial_guess = 45*1E-3
+            sigma_lower_bound = sigma_initial_guess - 1*1E-3
+            sigma_upper_bound = sigma_initial_guess + 1*1E-3
             
             if model_idx == 1:
                 # Params: amp1, t0, k_tau, sigma, amp_offset
                 model = self.model1
-                initial_guess = [0.05, 0, 10, 0.01, 0.05] 
 
-                lower_bounds = [0, -np.inf, 0.0, 0, 0]
-                upper_bounds = [1.0, np.inf, np.inf, np.inf, np.inf]
+                initial_guess = [0.05, 0, 10, sigma_initial_guess, 0.05] 
+
+                lower_bounds = [0, -np.inf, 0.0, sigma_lower_bound, 0]
+                upper_bounds = [1.0, np.inf, np.inf, sigma_upper_bound, np.inf]
 
             elif model_idx == 2:
-                # Params: amp1, t0, k1, sigma, amp_offset, amp2, k2
+                # Params: amp1, t0, k1, sigma, amp_offset, amp2, k2, t02
                 model = self.model2
 
-                initial_guess = [np.max(tgsignal), 0, 3, 0.01, 0.05, 0.01*np.max(tgsignal), 0] 
+                initial_guess = [np.max(tgsignal), 0, 3, sigma_initial_guess, 0.05, 0.01*np.max(tgsignal), 0, 0] 
 
-                lower_bounds = [0, -np.inf, 3, 0, 0, 0, 0]
-                upper_bounds = [1.0, np.inf, 30, np.inf, np.inf, 0.02*np.max(tgsignal), np.inf]
+                lower_bounds = [0, -np.inf, 3, sigma_lower_bound, 0, 0, 0, 0]
+                upper_bounds = [1.0, np.inf, 30, sigma_upper_bound, np.inf, 0.02*np.max(tgsignal), np.inf, 1]
 
             elif model_idx == 3:
-                # Params: amp1, amp2, amp3, t0, k1, k2, k3, sigma
+                # Params: amp1, amp2, amp3, t0, k1, k2, k3, sigma, t02, t03
 
                 model = self.model3
-                initial_guess = [np.max(tgsignal), 0.02*np.max(tgsignal), 0.02*np.max(tgsignal), 0.01, 3, 2.5, 0.1, 0.1] 
 
-                lower_bounds = [0, 0, 0, -np.inf, 3, 0, 0, 0]
-                upper_bounds = [1.0, 0.02*np.max(tgsignal), np.inf, 30, np.inf, np.inf, 0.1, np.inf]
+                initial_guess = [np.max(tgsignal), 0.02*np.max(tgsignal), 0.02*np.max(tgsignal), 0.01, 3, 2.5, 0.1, sigma_initial_guess, 0.01, 0] 
+
+                lower_bounds = [0, 0, 0, -np.inf, 3, 0, 0, sigma_lower_bound,0, 0]
+                upper_bounds = [1.0, 0.02*np.max(tgsignal), np.inf, 30, np.inf, np.inf, 0.1, sigma_upper_bound, 1, 1]
 
             else:
                 raise ValueError("Invalid model index")
@@ -313,7 +333,7 @@ class TGAnalysis:
                     "amp1": [popt[0], perr[0], "Amplitude 1 (a.u.)", "Amplitude 1"],
                     "t0": [popt[1], perr[1], r"$t_0$(ps)", "Time 0"],
                     "tau": [(1/popt[2])*1000, (perr[2]/popt[2]**2)*1000, "Decay time (fs)", "Decay time"],
-                    "sigma": [popt[3], perr[3], r"$\sigma$(ps)", "Sigma"],
+                    "sigma": [popt[3]*1000, perr[3]*1000, r"$\sigma$(fs)", "Sigma"],
                     "ampoff": [popt[4], perr[4], "Amplitude offset (a.u.)", "Amplitude offset"],
                     "r2": [self.r2_fit[i], 0, "$R^2$", r"$R^2$"]
                 }
@@ -323,7 +343,7 @@ class TGAnalysis:
                     "amp1": [popt[0], perr[0], "Amplitude 1 (a.u.)", "Amplitude 1"],
                     "t0": [popt[1], perr[1], r"$t_0$(ps)", "Time 0"],
                     "tau": [(1/popt[2])*1000, (perr[2]/popt[2]**2)*1000, "Decay time (fs)", "Decay time"],
-                    "sigma": [popt[3], perr[3], r"$\sigma$(ps)", "Sigma"],
+                    "sigma": [popt[3]*1000, perr[3]*1000, r"$\sigma$(fs)", "Sigma"],
                     "ampoff": [popt[4], perr[4], "Amplitude offset (a.u.)", "Amplitude offset"],
                     "amp2": [popt[5], perr[5], "Amplitude 2 (a.u.)", "Amplitude 2"],
                     "tau2": [(1/popt[6])*1000, (perr[6]/popt[6]**2)*1000, "Decay time 2 (fs)", "Decay time 2"],
@@ -339,7 +359,7 @@ class TGAnalysis:
                     "tau": [(1/popt[4])*1000, (perr[4]/popt[4]**2)*1000, "Decay time (fs)", "Decay time"],
                     "tau2": [(1/popt[5])*1000, (perr[5]/popt[5]**2)*1000, "Decay time 2 (fs)", "Decay time 2"],
                     "tau3": [(1/popt[6])*1000, (perr[6]/popt[6]**2)*1000, "Decay time 3 (fs)", "Decay time 3"],
-                    "sigma": [popt[7], perr[7], r"$\sigma$(ps)", "Sigma"],
+                    "sigma": [popt[7]*1000, perr[7]*1000, r"$\sigma$(fs)", "Sigma"],
                     "r2": [self.r2_fit[i], 0, "$R^2$", r"$R^2$"],
                     "ampoff": [np.nan, np.nan, "Amplitude offset (a.u.)", "Amplitude offset"],
                 }
@@ -380,7 +400,16 @@ class TGAnalysis:
             plt.show()
 
     def plot_fits(self, save_path=None, components_bool=False):
-        """Plot data vs fitted curves and relative error per scan."""
+        """Plot data vs fitted curves and relative error per scan.
+
+        Parameters
+        ----------
+        save_path : str or None, optional
+            If set, save the multi-panel figure to this path.
+        components_bool : bool, optional
+            If ``True``, overlay analytic fit components (per model) as dashed
+            curves using ``popts`` from the last ``get_fit_parameters`` run.
+        """
         if not hasattr(self, "times_fit") or not hasattr(self, "tgsignals_fit"):
             raise ValueError("Fit data not found. Run get_fit_parameters() first.")
         if not hasattr(self, "tgsignals_sampled_fit"):
@@ -432,15 +461,15 @@ class TGAnalysis:
                         return [[comp1, "Exponential"], [comp2, "Offset"]]
 
                 elif self.model_index == 2:
-                    def model(t, amp1, t0, k1, sigma, amp_offset, amp2, k2):
-                        """Model 2: bi-exponential decay: one decay plus one damped oscillatory contribution."""
+                    def model(t, amp1, t0, k1, sigma, amp_offset, amp2, k2, t02):
+                        """Model 2 components: main exponential, offset, second exponential."""
                         exp1 = np.exp(-(t - t0)*k1)
                         exp2 = np.exp(0.5*(k1*sigma)**2)
-                        exp3 = np.exp(-k2*(t - t0))
+                        exp3 = np.exp(-k2*(t - t02))
                         exp4 = np.exp(-0.5*(k2*sigma)**2)
                         erf1 = special.erf((t - t0 - k1*sigma**2)/(np.sqrt(2)*sigma))
                         erf2 = special.erf((t-t0)/(np.sqrt(2)*sigma))
-                        erf3 = special.erf((t-t0-k2*sigma**2)/(np.sqrt(2)*sigma))
+                        erf3 = special.erf((t-t02-k2*sigma**2)/(np.sqrt(2)*sigma))
                         comp1 = amp1*exp1*exp2*(1 + erf1)
                         comp2 = amp_offset*(1 + erf2)
                         comp3 = amp2*exp3*exp4*(1 + erf3)
@@ -448,17 +477,17 @@ class TGAnalysis:
                         return [[comp1, "Exponential"], [comp2, "Offset"], [comp3, "Exponential 2"]]
 
                 elif self.model_index == 3:
-                    def model(t, amp1, amp2, amp3, t0, k1, k2, k3, sigma):
-                        """Model 3: multi-exponential decay: two decay plus one damped oscillatory contribution."""
+                    def model(t, amp1, amp2, amp3, t0, k1, k2, k3, sigma, t02, t03):
+                        """Model 3 components: three Gaussian-convolved exponentials."""
                         exp1 = np.exp(-(t - t0)*k1)
-                        exp2 = np.exp(-(t - t0)*k2)
-                        exp3 = np.exp(-(t - t0)*k3)
+                        exp2 = np.exp(-(t - t02)*k2)
+                        exp3 = np.exp(-(t - t03)*k3)
                         exp4 = np.exp(-0.5*(k1*sigma)**2)
                         exp5 = np.exp(-0.5*(k2*sigma)**2)
                         exp6 = np.exp(-0.5*(k3*sigma)**2)
                         erf1 = special.erf((t - t0 - k1*sigma**2)/(np.sqrt(2)*sigma))
-                        erf2 = special.erf((t - t0 - k2*sigma**2)/(np.sqrt(2)*sigma))
-                        erf3 = special.erf((t - t0 - k3*sigma**2)/(np.sqrt(2)*sigma))
+                        erf2 = special.erf((t - t02 - k2*sigma**2)/(np.sqrt(2)*sigma))
+                        erf3 = special.erf((t - t03 - k3*sigma**2)/(np.sqrt(2)*sigma))
                         comp1 = amp1*exp1*exp4*(1 + erf1)
                         comp2 = amp2*exp2*exp5*(1 + erf2)
                         comp3 = amp3*exp3*exp6*(1 + erf3)
@@ -494,7 +523,7 @@ class TGAnalysis:
             plt.show()
 
     def plot_params_vs_energy(self, param_name, errors_bool=False, save_path=None):
-        """Plot fitted decay times vs energy with absorbance references."""
+        """Plot a fitted parameter vs scan energy with absorbance references."""
         
         data_Co2plus = np.genfromtxt("/Users/manuelfernandosanchezalarcon/Desktop/Trieste_Project/Transient_Grating/transient_grating_project/external_files/Co2plus_absorbance.txt")
         data_Co3plus = np.genfromtxt("/Users/manuelfernandosanchezalarcon/Desktop/Trieste_Project/Transient_Grating/transient_grating_project/external_files/Co3plus_absorbance.txt")
@@ -547,7 +576,7 @@ class TGAnalysis:
             plt.show()
 
     def plot_params_vs_intensity(self, param_name, errors_bool=False, save_path=None):
-        """Plot fitted decay times vs intensity."""
+        """Plot a fitted parameter vs scan intensity."""
         
         plt.figure(figsize=(8, 5))
 
@@ -586,6 +615,12 @@ class TGAnalysis:
             Subset of scan indices to plot, or ``"all"`` for every scan.
         data_over_fit : bool, optional
             If ``True``, overlay sampled data in the fit panel.
+        save_path : str or None, optional
+            If set, save the figure using tight bounding box padding for legends.
+
+        Notes
+        -----
+        Traces are divided by their peak amplitude so stacked scans are comparable.
         """
         fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
         ax_data, ax_fit = axes

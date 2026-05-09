@@ -8,8 +8,9 @@ Notation
 --------
 
 * :math:`t`: time (ps).
-* :math:`t_0`: time-zero shift.
-* :math:`\sigma`: Gaussian instrument-response width.
+* :math:`t_0`: time-zero shift for the primary decay channel (ps).
+* :math:`t_{02}, t_{03}`: optional additional time shifts used by Models 2--3 for extra exponentials (ps).
+* :math:`\sigma`: Gaussian instrument-response width (fitted in ps; reported as fs in ``params_fit``).
 * :math:`k, k_1, k_2, k_3`: decay rates in ps :math:`^{-1}`.
 * :math:`\tau = 1/k`: decay time (reported in fs in fit summaries).
 * :math:`\mathrm{erf}(\cdot)`: error function.
@@ -55,14 +56,14 @@ where:
 .. math::
 
    f_{\mathrm{exp},2}(t) =
-   A_2 \exp\!\left[-k_2(t-t_0)\right]
+   A_2 \exp\!\left[-k_2(t-t_{02})\right]
    \exp\!\left(-\frac{(k_2\sigma)^2}{2}\right)
-   \left[1 + \mathrm{erf}\!\left(\frac{t-t_0-k_2\sigma^2}{\sqrt{2}\sigma}\right)\right].
+   \left[1 + \mathrm{erf}\!\left(\frac{t-t_{02}-k_2\sigma^2}{\sqrt{2}\sigma}\right)\right].
 
 Model 3 (``model3``)
 --------------------
 
-A sum of three Gaussian-convolved exponential channels:
+A sum of three Gaussian-convolved exponential channels with independent time zeros:
 
 .. math::
 
@@ -70,18 +71,19 @@ A sum of three Gaussian-convolved exponential channels:
    A_1 e^{-(t-t_0)k_1} e^{-\frac{(k_1\sigma)^2}{2}}
    \left[1+\mathrm{erf}\!\left(\frac{t-t_0-k_1\sigma^2}{\sqrt{2}\sigma}\right)\right]
    +
-   A_2 e^{-(t-t_0)k_2} e^{-\frac{(k_2\sigma)^2}{2}}
-   \left[1+\mathrm{erf}\!\left(\frac{t-t_0-k_2\sigma^2}{\sqrt{2}\sigma}\right)\right]
+   A_2 e^{-(t-t_{02})k_2} e^{-\frac{(k_2\sigma)^2}{2}}
+   \left[1+\mathrm{erf}\!\left(\frac{t-t_{02}-k_2\sigma^2}{\sqrt{2}\sigma}\right)\right]
    +
-   A_3 e^{-(t-t_0)k_3} e^{-\frac{(k_3\sigma)^2}{2}}
-   \left[1+\mathrm{erf}\!\left(\frac{t-t_0-k_3\sigma^2}{\sqrt{2}\sigma}\right)\right].
+   A_3 e^{-(t-t_{03})k_3} e^{-\frac{(k_3\sigma)^2}{2}}
+   \left[1+\mathrm{erf}\!\left(\frac{t-t_{03}-k_3\sigma^2}{\sqrt{2}\sigma}\right)\right].
 
 Bounds and reported :math:`\tau`
 ---------------------------------
 
 Fitted decay rates :math:`k` (in ps :math:`^{-1}`) are converted to
 :math:`\tau = 1000/k` fs when filling ``"tau"``, ``"tau2"``, and ``"tau3"``
-entries in ``params_fit``. Model 1 and Model 2 also expose ``"ampoff"``
+entries in ``params_fit``. The Gaussian width ``sigma`` is stored in fs in
+``params_fit``. Model 1 and Model 2 also expose ``"ampoff"``
 for the convolved offset term; for plotting compatibility across models,
 Model 3 stores ``"ampoff"`` as ``NaN``.
 

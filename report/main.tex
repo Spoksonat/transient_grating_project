@@ -76,7 +76,7 @@ The first model is described by the following equation:
 \begin{align}
     \begin{split}
         f(t)
-        &= \qty[A_1 e^{-(t-t_0)/\tau} + A_{offset}]
+        &= \qty[A_1 e^{-t/\tau} + A_{offset}]
         \circledast \frac{1}{\sqrt{2\pi}\sigma} e^{-(t-t_0)^2/(2\sigma^2)} \\
         &= A_1 e^{-(t-t_0)/\tau} e^{\sigma^2/(2\tau^2)}
         \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau}{\sqrt{2}\sigma}\right)\right) \\
@@ -90,12 +90,12 @@ The second model is described by the following equation:
 \begin{align}
     \begin{split}
     f(t)
-    &= \qty[A_1 e^{-(t-t_0)/\tau} + A_2 e^{-(t-t_0)/\tau_2} + A_{offset}]
+    &= \qty[A_1 e^{-t/\tau} + A_2 e^{-(t-t_{0,2})/\tau_2} + A_{offset}]
     \circledast \frac{1}{\sqrt{2\pi}\sigma} e^{-(t-t_0)^2/(2\sigma^2)} \\
     &= A_1 e^{-(t-t_0)/\tau} e^{\sigma^2/(2\tau^2)}
     \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau}{\sqrt{2}\sigma}\right)\right) \\
-    &\quad + A_2 e^{-(t-t_0)/\tau_2} e^{\sigma^2/(2\tau_2^2)}
-    \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_2}{\sqrt{2}\sigma}\right)\right) \\
+    &\quad + A_2 e^{-(t-t'_{0,2})/\tau_2} e^{\sigma^2/(2\tau_2^2)}
+    \left(1 + \erf\!\left(\frac{t-t'_{0,2}-\sigma^2/\tau_2}{\sqrt{2}\sigma}\right)\right) \\
     &\quad + A_{offset} \left(1 + \erf\!\left(\frac{t-t_0}{\sqrt{2}\sigma}\right)\right)\\
     &= f_{2,1}(t) + f_{2,2}(t) + f_{2,3}(t).
     \end{split}
@@ -106,14 +106,14 @@ The third model is described by the following equation:
 \begin{align}
     \begin{split}
     f(t)
-    &= \qty[A_1 e^{-(t-t_0)/\tau} + A_2 e^{-(t-t_0)/\tau_2} + A_3 e^{-(t-t_0)/\tau_3}]
+    &= \qty[A_1 e^{-t/\tau} + A_2 e^{-(t-t_{0,2})/\tau_2} + A_3 e^{-(t-t_{0,3})/\tau_3}]
     \circledast \frac{1}{\sqrt{2\pi}\sigma} e^{-(t-t_0)^2/(2\sigma^2)} \\
     &= A_1 e^{-(t-t_0)/\tau} e^{\sigma^2/(2\tau^2)}
     \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau}{\sqrt{2}\sigma}\right)\right) \\
-    &\quad + A_2 e^{-(t-t_0)/\tau_2} e^{\sigma^2/(2\tau_2^2)}
-    \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_2}{\sqrt{2}\sigma}\right)\right) \\
-    &\quad + A_3 e^{-(t-t_0)/\tau_3} e^{\sigma^2/(2\tau_3^2)}
-    \left(1 + \erf\!\left(\frac{t-t_0-\sigma^2/\tau_3}{\sqrt{2}\sigma}\right)\right)\\
+    &\quad + A_2 e^{-(t-t'_{0,2})/\tau_2} e^{\sigma^2/(2\tau_2^2)}
+    \left(1 + \erf\!\left(\frac{t-t'_{0,2}-\sigma^2/\tau_2}{\sqrt{2}\sigma}\right)\right) \\
+    &\quad + A_3 e^{-(t-t'_{0,3})/\tau_3} e^{\sigma^2/(2\tau_3^2)}
+    \left(1 + \erf\!\left(\frac{t-t'_{0,3}-\sigma^2/\tau_3}{\sqrt{2}\sigma}\right)\right)\\
     &= f_{3,1}(t) + f_{3,2}(t) + f_{3,3}(t).
     \end{split}
     \end{align}

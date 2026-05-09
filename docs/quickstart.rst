@@ -35,6 +35,7 @@ Minimal example
    # 3) Fit model and inspect results
    analysis.get_fit_parameters(model_idxs=2, initial_guess_bool=True, bounds=True)
    analysis.plot_fits()
+   # Optional: analysis.plot_fits(components_bool=True)
    if mode == "constant_E":
        analysis.plot_params_vs_intensity(param_name=param_name, errors_bool=False)
    else:

@@ -42,6 +42,9 @@ The current code/notebook workflow includes:
 - Parameter-vs-intensity plotting via `plot_params_vs_intensity(param_name=...)`.
 - Multi-model comparison via `plot_params_all_models(..., mode=...)`.
 - Current exported fit parameters include `ampoff` (models 1/2, with NaN placeholder in model 3), `tau`, `tau2`, `tau3`, and `r2` for reporting.
+- `sigma` is stored in **femtoseconds** in `params_fit` (fits use ps internally).
+- Optional per-scan fit decomposition via `plot_fits(..., components_bool=True)`.
+- Stacked TG plots (`plot_stacked_signals`) normalize each trace by its peak for comparison.
 
 ## Data contract
 
@@ -80,6 +83,7 @@ else:
 analysis.get_fit_parameters(model_idxs=2, initial_guess_bool=True, bounds=True)
 
 analysis.plot_fits()
+# Optional: analysis.plot_fits(components_bool=True)
 if mode == "constant_E":
     analysis.plot_params_vs_intensity(param_name=param_name, errors_bool=False)
 else:
